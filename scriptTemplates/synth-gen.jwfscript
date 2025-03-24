@@ -1,0 +1,207 @@
+import org.jwildfire.create.tina.base.Flame;
+import org.jwildfire.create.tina.base.XForm;
+import org.jwildfire.create.tina.palette.RGBPalette;
+import org.jwildfire.create.tina.script.ScriptRunnerEnvironment;
+import org.jwildfire.create.tina.transform.XFormTransformService;
+import org.jwildfire.create.tina.base.Layer;
+import org.jwildfire.create.tina.base.DrawMode;
+import org.jwildfire.create.tina.base.ColorType;
+import org.jwildfire.create.tina.variation.Variation;
+import org.jwildfire.create.tina.variation.VariationFunc;
+import org.jwildfire.create.tina.variation.VariationFuncList;
+import org.jwildfire.create.tina.mutagen.RandomGradientMutation;
+import org.jwildfire.create.tina.transform.XFormTransformService;
+import org.jwildfire.create.tina.base.EditPlane;
+import org.jwildfire.base.Tools;
+import static org.jwildfire.base.mathlib.MathLib.M_PI;
+
+public void run(ScriptRunnerEnvironment pEnv) throws Exception {
+  // create a new flame
+   Flame flame = new Flame();
+    Layer layer = flame.getFirstLayer();
+    flame.setCentreX(0.0);
+    flame.setCentreY(0.0);
+    flame.setPixelsPerUnit(300+Math.random()*300.0);
+    layer.getFinalXForms().clear();
+    layer.getXForms().clear();
+    // init
+    // These vars affect the style of the centre effect
+    double centre_synth = 0.7;
+    double centre_mode = Tools.randomInt(20); //5;
+    double centre_noise = .0;
+    double centre_power = -1.0;
+    double centre_smooth = 1;
+    double centre_color = 0.4 + 0.2 * Math.random();
+    double centre_symmetry = 0.6 + 0.4 * Math.random();
+    XForm xForm1;
+    // 1st XForm
+    {
+      XForm xForm = xForm1 = new XForm();
+      layer.getXForms().add(xForm);
+      xForm.setWeight(1.0);
+      //xForm.setColor(0.0);
+      xForm.setColorType(ColorType.TARGET);
+            xForm.setTargetColor(196,157, 228);
+      xForm.setColorSymmetry(-1.0);
+
+      VariationFunc synth = VariationFuncList.getVariationFuncInstance("synth");
+      xForm.addVariation(1.0, synth);
+      synth.setParameter("mode", Tools.randomInt(20)); //3;
+      synth.setParameter("power", -0.2);
+
+      int numWaves = (int) (Math.random() * 3.5 + 2);
+      // Starting circle . . .
+      synth.setParameter("a", 0.8 + (Math.random() * 0.4));
+      // Wave #1
+      synth.setParameter("b", Math.random() * 2);
+      synth.setParameter("b_type", Tools.randomInt(7));
+      synth.setParameter("b_frq", Tools.randomInt(7) + 1);
+      synth.setParameter("b_phs", Math.random() * M_PI);
+      synth.setParameter("b_layer", Tools.randomInt(4));
+      // Skew effect?
+      if (Math.random() < 0.2) {
+        synth.setParameter("b_skew", Math.random() * 2 - 1);
+      }
+      // Exceptionally high frequency?
+      if (Math.random() < 0.1) {
+        synth.setParameter("b_frq", Tools.randomInt(20) + 7);
+      }
+      // Usually higher frequencies affect the amplitude
+      if (Math.random() < 0.8) {
+        synth.setParameter("b", (Double) synth.getParameter("b") / (1 + 0.3 * (Double) synth.getParameter("b_frq")));
+      }
+
+      // Wave #2
+      synth.setParameter("c", Math.random());
+      synth.setParameter("c_type", Tools.randomInt(7));
+      synth.setParameter("c_frq", Tools.randomInt(7) + 1);
+      synth.setParameter("c_phs", Math.random() * M_PI);
+      synth.setParameter("c_layer", Tools.randomInt(4));
+      // Skew effect?
+      if (Math.random() < 0.2) {
+        synth.setParameter("c_skew", Math.random() * 2 - 1);
+      }
+      // Exceptionally high frequency?
+      if (Math.random() < 0.1) {
+        synth.setParameter("c_frq", Tools.randomInt(20) + 7);
+      }
+      // Usually higher frequencies affect the amplitude
+      if (Math.random() < 0.8) {
+        synth.setParameter("c", (Double) synth.getParameter("c") / (1 + 0.3 * (Double) synth.getParameter("c_frq")));
+      }
+
+      // Wave #3
+      if (numWaves >= 3) {
+        synth.setParameter("d", Math.random());
+        synth.setParameter("d_type", Tools.randomInt(7));
+        synth.setParameter("d_frq", Tools.randomInt(7) + 1);
+        synth.setParameter("d_phs", Math.random() * M_PI);
+        synth.setParameter("d_layer", Tools.randomInt(4));
+        // Skew effect?
+        if (Math.random() < 0.2) {
+          synth.setParameter("d_skew", Math.random() * 2 - 1);
+        }
+        // Exceptionally high frequency?
+        if (Math.random() < 0.1) {
+          synth.setParameter("d_frq", Tools.randomInt(20) + 7);
+        }
+        // Usually higher frequencies affect the amplitude
+        if (Math.random() < 0.8) {
+          synth.setParameter("d", (Double) synth.getParameter("d") / (1 + 0.3 * (Double) synth.getParameter("d_frq")));
+        }
+      }
+
+      // Wave #4
+      if (numWaves >= 4) {
+        synth.setParameter("e", Math.random());
+        synth.setParameter("e_type", Tools.randomInt(7));
+        synth.setParameter("e_frq", Tools.randomInt(7) + 1);
+        synth.setParameter("e_phs", Math.random() * M_PI);
+        synth.setParameter("e_layer", Tools.randomInt(4));
+        // Skew effect?
+        if (Math.random() < 0.2) {
+          synth.setParameter("e_skew", Math.random() * 2 - 1);
+        }
+        // Exceptionally high frequency?
+        if (Math.random() < 0.1) {
+          synth.setParameter("e_frq", Tools.randomInt(20) + 7);
+        }
+        // Usually higher frequencies affect the amplitude
+        if (Math.random() < 0.8) {
+          synth.setParameter("e", (Double) synth.getParameter("e") / (1 + 0.3 * (Double) synth.getParameter("e_frq")));
+        }
+      }
+
+      // Wave #5
+      if (numWaves >= 5) {
+        synth.setParameter("f", Math.random());
+        synth.setParameter("f_type", Tools.randomInt(7));
+        synth.setParameter("f_frq", Tools.randomInt(7) + 1);
+        synth.setParameter("f_phs", Math.random() * M_PI);
+        synth.setParameter("f_layer", Tools.randomInt(4));
+        // Skew effect?
+        if (Math.random() < 0.2) {
+          synth.setParameter("f_skew", Math.random() * 2 - 1);
+        }
+        // Exceptionally high frequency?
+        if (Math.random() < 0.1) {
+          synth.setParameter("f_frq", Tools.randomInt(20) + 7);
+        }
+        // Usually higher frequencies affect the amplitude
+        if (Math.random() < 0.8) {
+          synth.setParameter("f", (Double) synth.getParameter("f") / (1 + 0.3 * (Double) synth.getParameter("f_frq")));
+        }
+      }
+    }
+
+    // Second "inner" transform is smaller with a little noise
+    // added to remove annoying lines at the centre
+    {
+      XForm xForm = xForm1.makeCopy();
+      layer.getXForms().add(xForm);
+      xForm.setWeight(1.0);
+      //xForm.setColor(centre_color);
+      xForm.setColorType(ColorType.TARGET);
+            xForm.setTargetColor(196,157, 228);
+      xForm.setColorSymmetry(centre_symmetry);
+
+      VariationFunc synth = xForm.getVariation(0).getFunc();
+      xForm.getVariation(0).setAmount(centre_synth);
+      synth.setParameter("power", centre_power);
+      synth.setParameter("mode", centre_mode);
+      synth.setParameter("smooth", centre_smooth);
+
+      VariationFunc noise = VariationFuncList.getVariationFuncInstance("noise");
+      xForm.addVariation(centre_noise, noise);
+
+    }
+
+    if (Math.random() < 0.55) {
+      XForm xForm = new XForm();
+      layer.getXForms().add(xForm);
+      xForm.setWeight(5 * Math.random() + 0.125);
+      //xForm.setColor(centre_color + 0.2 * Math.random());
+      xForm.setColorType(ColorType.TARGET);
+            xForm.setTargetColor(196,157, 228);
+      xForm.setColorSymmetry(centre_symmetry - 0.4 * Math.random());
+
+      VariationFunc varFunc = VariationFuncList.getVariationFuncInstance(VariationFuncList.getRandomVariationname());
+      xForm.addVariation(0.25 + Math.random() * 1.5, varFunc);
+
+      xForm.getModifiedWeights()[1] = 0.0;
+    }
+   
+   
+  
+  // Either update the currently selected flame (to not need to create a new thumbnail
+  // in the thumbnail ribbon after each run of the script...
+  Flame selFlame = pEnv.getCurrFlame();
+  if(selFlame!=null) {
+    selFlame.assign(flame);
+    pEnv.refreshUI();
+  }
+  // ...or load the flame in the editor and refresh the UI
+  else {
+    pEnv.setCurrFlame(flame);
+  }
+}

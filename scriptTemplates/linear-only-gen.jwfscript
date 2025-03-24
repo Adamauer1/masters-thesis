@@ -1,0 +1,76 @@
+import org.jwildfire.create.tina.base.Flame;
+import org.jwildfire.create.tina.base.XForm;
+import org.jwildfire.create.tina.palette.RGBPalette;
+import org.jwildfire.create.tina.script.ScriptRunnerEnvironment;
+import org.jwildfire.create.tina.transform.XFormTransformService;
+import org.jwildfire.create.tina.base.Layer;
+import org.jwildfire.create.tina.base.DrawMode;
+import org.jwildfire.create.tina.base.ColorType;
+import org.jwildfire.create.tina.variation.Variation;
+import org.jwildfire.create.tina.variation.VariationFunc;
+import org.jwildfire.create.tina.variation.VariationFuncList;
+import org.jwildfire.create.tina.mutagen.RandomGradientMutation;
+import org.jwildfire.create.tina.transform.XFormTransformService;
+import org.jwildfire.create.tina.base.EditPlane;
+import org.jwildfire.create.tina.variation.Linear3DFunc;
+
+public void run(ScriptRunnerEnvironment pEnv) throws Exception {
+  // create a new flame
+  Flame flame = new Flame();
+    Layer layer = flame.getFirstLayer();
+    flame.setCentreX(0.0);
+    flame.setCentreY(0.0);
+    flame.setPixelsPerUnit(200);
+    layer.getFinalXForms().clear();
+    layer.getXForms().clear();
+
+    int maxXForms = (int) (1.0 + Math.random() * 5.0);
+    double scl = 1.0;
+    double tscl = 2.0;
+
+    boolean contRot = Math.random() < 0.5;
+    double r0 = 0;
+
+
+    for (int i = 0; i < maxXForms; i++) {
+      XForm xForm = new XForm();
+      layer.getXForms().add(xForm);
+      if (contRot) {
+        r0 += 45.0 * Math.random() - 9.0 * Math.random();
+        XFormTransformService.rotate(xForm, r0);
+      }
+      else {
+        if (Math.random() < 0.5) {
+          XFormTransformService.rotate(xForm, 360.0 * Math.random());
+        }
+        else {
+          XFormTransformService.rotate(xForm, -360.0 * Math.random());
+        }
+      }
+      XFormTransformService.localTranslate(xForm, (2.0 * Math.random() - 1.0) * tscl, (2.0 * Math.random() - 1.0) * tscl);
+      scl *= 0.8 + Math.random() * 0.1;
+      tscl *= 0.8 + Math.random() * 0.1;
+
+      XFormTransformService.scale(xForm, scl, true, true);
+
+      //xForm.setColor(Math.random());
+      xForm.setColorType(ColorType.TARGET);
+      xForm.setTargetColor(202,166, 225);
+      xForm.addVariation(Math.random() * 0.5 + 0.5, new Linear3DFunc());
+      xForm.setWeight(scl * Math.random() * 19.9 + 0.1);
+    }
+
+
+  
+  // Either update the currently selected flame (to not need to create a new thumbnail
+  // in the thumbnail ribbon after each run of the script...
+  Flame selFlame = pEnv.getCurrFlame();
+  if(selFlame!=null) {
+    selFlame.assign(flame);
+    pEnv.refreshUI();
+  }
+  // ...or load the flame in the editor and refresh the UI
+  else {
+    pEnv.setCurrFlame(flame);
+  }
+}
