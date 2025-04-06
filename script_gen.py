@@ -51,32 +51,32 @@ print(test[1])
 
 angle = math.degrees(math.atan2(test[2][1], test[1][0]))
 
-cat = 0
+cat = ""
 
 if angle < 0:
     angle += 360
 
     if 0 <= angle < 45:
-        cat = 2
+        cat = "JulianTest.jsfscript" #2
     elif 45 <= angle < 90:
-        cat = 1
+        cat = "e-disc-gen.jwfscript" #1
     elif 90 <= angle < 135:
-        cat = 8
+        cat = "synth-gen.jwfscript" #8
     elif 135 <= angle < 180:
-        cat = 7
+        cat = "synth-gen.jwfscript" #7
     elif 180 <= angle < 225:
-        cat = 6
+        cat = "linear-only-gen.jwfscript" #6
     elif 225 <= angle < 270:
-        cat = 5
+        cat = "MandTest.jwfscript" #5
     elif 270 <= angle < 315:
-        cat = 4
+        cat = "JulianTest.jwfscript" #4
     else:  # 315 <= angle < 360
-        cat = 3
+        cat = "galaxies-gen.jwfscript" #3
 
 print(angle)
 print(cat)
 
-template_file = "scriptTemplates/JulianTest.jwfscript"
+template_file = f"scriptTemplates/{cat}"
 new_file = "scripts/TestScript.jwfscript"
 placeholders = {
     "PLACEHOLDER_1": 1,
