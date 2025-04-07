@@ -24,7 +24,7 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
     layer.getFinalXForms().clear();
     layer.getXForms().clear();
 
-    int maxXForms = (int) (1.0 + Math.random() * 5.0);
+    int maxXForms = (int) (2.0 + Math.random() * 5.0);
     double scl = RMSENERGY;
     double tsclX = VALENCE * 10;
     double tsclY = AROUSAL * 10;
