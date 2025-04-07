@@ -25,8 +25,9 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
     layer.getXForms().clear();
 
     int maxXForms = (int) (1.0 + Math.random() * 5.0);
-    double scl = 1.0;
-    double tscl = 2.0;
+    double scl = RMSENERGY;
+    double tsclX = VALENCE * 10;
+    double tsclY = AROUSAL * 10;
 
     boolean contRot = Math.random() < 0.5;
     double r0 = 0;
@@ -47,15 +48,16 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
           XFormTransformService.rotate(xForm, -360.0 * Math.random());
         }
       }
-      XFormTransformService.localTranslate(xForm, (2.0 * Math.random() - 1.0) * tscl, (2.0 * Math.random() - 1.0) * tscl);
+      XFormTransformService.localTranslate(xForm, (2.0 * Math.random() - 1.0) * tsclX, (2.0 * Math.random() - 1.0) * tsclY);
+      //XFormTransformService.localTranslate(xForm, (2.0 * PLACEHOLDER_1 - 1.0) * tscl, (2.0 * PLACEHOLDER_2 - 1.0) * tscl);
       scl *= 0.8 + Math.random() * 0.1;
-      tscl *= 0.8 + Math.random() * 0.1;
-
+      tsclX *= 0.8 + Math.random() * 0.1;
+      tsclY *= 0.8 + Math.random() * 0.1;
       XFormTransformService.scale(xForm, scl, true, true);
 
       //xForm.setColor(Math.random());
       xForm.setColorType(ColorType.TARGET);
-      xForm.setTargetColor(202,166, 225);
+      xForm.setTargetColor(RED,GREEN,BLUE);
       xForm.addVariation(Math.random() * 0.5 + 0.5, new Linear3DFunc());
       xForm.setWeight(scl * Math.random() * 19.9 + 0.1);
     }

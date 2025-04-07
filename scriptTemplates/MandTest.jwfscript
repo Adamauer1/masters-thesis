@@ -34,8 +34,8 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
       xForm.setWeight(0.00001 + Math.random() * 20.0);
       //xForm.setColor(Math.random());
       xForm.setColorType(ColorType.TARGET);
-      xForm.setTargetColor(196,157, 228);
-      XFormTransformService.localTranslate(xForm, -0.81, 0.136, false);
+      xForm.setTargetColor(RED,GREEN,BLUE);
+      XFormTransformService.localTranslate(xForm, VALENCE, AROUSAL, false);
       XFormTransformService.rotate(xForm, 360.0*Math.random(), false);
       if (Math.random() < 0.5) {
         xForm.addVariation(-1.0 + Math.random() * 2.0, VariationFuncList.getVariationFuncInstance(VariationFuncList.getRandomVariationname(), true));
@@ -53,8 +53,8 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
       xForm.setWeight(0.00001 + Math.random() * 6.0);
       //xForm.setColor(Math.random());
       xForm.setColorType(ColorType.TARGET);
-      xForm.setTargetColor(202,166, 225);
-      XFormTransformService.localTranslate(xForm, -0.81, 0.136, false);
+      xForm.setTargetColor(RED,GREEN,BLUE);
+      XFormTransformService.localTranslate(xForm, VALENCE, AROUSAL, false);
       XFormTransformService.rotate(xForm, 360.0*Math.random(), false);
       VariationFunc varFunc = VariationFuncList.getVariationFuncInstance(primary, true);
      // varFunc.setParameter("power", (int)(Math.random()*7) + 1);
@@ -75,8 +75,8 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
       xForm.setWeight(0.00001 + Math.random() * 2.0);
       //xForm.setColor(Math.random());
       xForm.setColorType(ColorType.TARGET);
-      xForm.setTargetColor(133,85, 234);
-      XFormTransformService.localTranslate(xForm, -0.81, 0.136, false);
+      xForm.setTargetColor(RED,GREEN,BLUE);
+      XFormTransformService.localTranslate(xForm, VALENCE, AROUSAL, false);
       XFormTransformService.rotate(xForm, 360.0*Math.random(), false);
       VariationFunc varFunc = VariationFuncList.getVariationFuncInstance(primary, true);
       //varFunc.setParameter("power", (int)(Math.random()*7) + 1);
