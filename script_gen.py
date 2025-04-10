@@ -30,6 +30,13 @@ arousal_df = pd.read_csv(arousal_file_path)
 valence_file_path = "Data/deam/valence.csv"
 valence_df = pd.read_csv(valence_file_path)
 
+audio_features_df = pd.read_csv("Data/deam/2.csv", delimiter=";")
+#print(audio_features_df)
+#audio_features = audio_features_df.values
+audio_features = audio_features_df.to_numpy()
+#print(audio_features)
+test_af = audio_features[(audio_features[:, 0] >= 15) & (audio_features[:, 0] < 45)]
+print(len(test_af))
 test_v = valence_df.head(1).to_numpy()[0]
 test_a = arousal_df.head(1).to_numpy()[0]
 # test_v = valence_df.head(2).to_numpy()[1]
@@ -40,8 +47,9 @@ test_a = test_a[1::]
 test_v = test_v[1::]
 test_v = test_v[~np.isnan(test_v)]
 
-print(len(test_v))
-print(len(test_a))
+# print(len(test_v))
+# print(len(test_a))
+
 # test = np.column_stack((test_v, test_a))
 #print(test)
 
@@ -143,8 +151,8 @@ def generate_script(valence_values, arousal_values):
     template_file = f"scriptTemplates/{categories[-1]}"
     new_file = "scripts/TestScript.jwfscript"
     placeholders = {
-        "VALENCE": test_v[1] * 3,
-        "AROUSAL": test_a[1] * -2,
+        "VALENCE": valence_values[0] * 3,
+        "AROUSAL": arousal_values[0] * -2,
         "RED": colors[0][0],
         "GREEN": colors[0][1],
         "BLUE": colors[0][2],
@@ -152,30 +160,6 @@ def generate_script(valence_values, arousal_values):
     }
     write_script(template_file, new_file, placeholders)
 
-generate_script(test_v, test_a)
+#generate_script(test_v, test_a)
 
 #write_script(template_file, new_file, placeholders)
-
-
-
-#cat = ""
-#angle = angles[0]
-# if angle < 0:
-#     angle += 360
-#
-#     if 0 <= angle < 45:
-#         cat = "JulianTest.jsfscript" #2
-#     elif 45 <= angle < 90:
-#         cat = "e-disc-gen.jwfscript" #1
-#     elif 90 <= angle < 135:
-#         cat = "synth-gen.jwfscript" #8
-#     elif 135 <= angle < 180:
-#         cat = "synth-gen.jwfscript" #7
-#     elif 180 <= angle < 225:
-#         cat = "linear-only-gen.jwfscript" #6
-#     elif 225 <= angle < 270:
-#         cat = "MandTest.jwfscript" #5
-#     elif 270 <= angle < 315:
-#         cat = "JulianTest.jwfscript" #4
-#     else:  # 315 <= angle < 360
-#         cat = "galaxies-gen.jwfscript" #3
