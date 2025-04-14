@@ -35,7 +35,7 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
       //xForm.setColor(Math.random());
       xForm.setColorType(ColorType.TARGET);
       xForm.setTargetColor(196,157, 228);
-      XFormTransformService.localTranslate(xForm, 1, 2, false);
+      XFormTransformService.localTranslate(xForm, PLACEHOLDER_1, PLACEHOLDER_2, false);
       XFormTransformService.rotate(xForm, 360.0*Math.random(), false);
       if (Math.random() < 0.5) {
         xForm.addVariation(-1.0 + Math.random() * 2.0, VariationFuncList.getVariationFuncInstance(VariationFuncList.getRandomVariationname(), true));
@@ -54,7 +54,7 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
       //xForm.setColor(Math.random());
       xForm.setColorType(ColorType.TARGET);
       xForm.setTargetColor(202,166, 225);
-      XFormTransformService.localTranslate(xForm, "1", "2", false);
+      XFormTransformService.localTranslate(xForm, "PLACEHOLDER_1", "PLACEHOLDER_2", false);
       XFormTransformService.rotate(xForm, 360.0*Math.random(), false);
       VariationFunc varFunc = VariationFuncList.getVariationFuncInstance(primary, true);
       varFunc.setParameter("power", (int)(Math.random()*7) + 1);
@@ -76,7 +76,7 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
       //xForm.setColor(Math.random());
       xForm.setColorType(ColorType.TARGET);
       xForm.setTargetColor(133,85, 234);
-      XFormTransformService.localTranslate(xForm, "1", "2", false);
+      XFormTransformService.localTranslate(xForm, "PLACEHOLDER_1", "PLACEHOLDER_2", false);
       XFormTransformService.rotate(xForm, 360.0*Math.random(), false);
       VariationFunc varFunc = VariationFuncList.getVariationFuncInstance(primary, true);
       varFunc.setParameter("power", (int)(Math.random()*7) + 1);

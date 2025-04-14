@@ -1,13 +1,28 @@
+import org.jwildfire.create.tina.base.Flame;
+import org.jwildfire.create.tina.base.XForm;
+import org.jwildfire.create.tina.palette.RGBPalette;
+import org.jwildfire.create.tina.script.ScriptRunnerEnvironment;
+import org.jwildfire.create.tina.transform.XFormTransformService;
+import org.jwildfire.create.tina.base.Layer;
+import org.jwildfire.create.tina.base.DrawMode;
+import org.jwildfire.create.tina.base.ColorType;
+import org.jwildfire.create.tina.variation.Variation;
+import org.jwildfire.create.tina.variation.VariationFunc;
+import org.jwildfire.create.tina.variation.VariationFuncList;
+import org.jwildfire.create.tina.mutagen.RandomGradientMutation;
+import org.jwildfire.create.tina.transform.XFormTransformService;
+import org.jwildfire.create.tina.base.EditPlane;
 
-    // create a new flame
-    Flame flameFRAMENUMBER = new Flame();
-    flameFRAMENUMBER.setCentreX(0.0);
-    flameFRAMENUMBER.setCentreY(0.0);
-    flameFRAMENUMBER.setPixelsPerUnit(200);
-    flameFRAMENUMBER.setCamZoom(1.0);
-    Layer layerFRAMENUMBER = flameFRAMENUMBER.getFirstLayer();
-    layerFRAMENUMBER.getFinalXForms().clear();
-    layerFRAMENUMBER.getXForms().clear();
+public void run(ScriptRunnerEnvironment pEnv) throws Exception {
+  // create a new flame
+  Flame flame = new Flame();
+    flame.setCentreX(0.0);
+    flame.setCentreY(0.0);
+    flame.setPixelsPerUnit(200);
+    flame.setCamZoom(1.0);
+    Layer layer = flame.getFirstLayer();
+    layer.getFinalXForms().clear();
+    layer.getXForms().clear();
     //flame.setPalette(palette)
 
     String primary = Math.random() < 0.666 ? "mandelbrot" : "fract_mandelbrot_wf";

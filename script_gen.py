@@ -1,9 +1,9 @@
 import math
-import os
-from PIL import Image
 
+from PIL import Image
 import numpy as np
 import pandas as pd
+
 
 def write_script(template_path, output_path, placeholders=None):
     if placeholders is None:
@@ -15,6 +15,10 @@ def write_script(template_path, output_path, placeholders=None):
 
 
     for placeholder, value in placeholders.items():
+        # if placeholder == 'COLOR':
+        #     color = get_random_gradient_color(value)
+        #     content = content.replace(placeholder, str(color))
+        #else:
         content = content.replace(placeholder, str(value))
 
 
@@ -31,12 +35,20 @@ valence_file_path = "Data/deam/valence.csv"
 valence_df = pd.read_csv(valence_file_path)
 
 audio_features_df = pd.read_csv("Data/deam/2.csv", delimiter=";")
+mask = (audio_features_df.index >= 30) & (audio_features_df.index <= 89)
+audio_features_df = audio_features_df[mask]
 #print(audio_features_df)
-#audio_features = audio_features_df.values
-audio_features = audio_features_df.to_numpy()
+test = np.append(audio_features_df.columns.values, ["valence", "arousal"])
+
+        
+
+#audio_features_df = audio_features_df.to_dict()
 #print(audio_features)
-test_af = audio_features[(audio_features[:, 0] >= 15) & (audio_features[:, 0] < 45)]
-print(len(test_af))
+#test_af = audio_features[(audio_features[:, 0] >= 15) & (audio_features[:, 0] < 45)]
+#print(af)
+#audio_features = audio_features_df.values
+#audio_features = audio_features_df.to_numpy()
+#print(test_af)
 test_v = valence_df.head(1).to_numpy()[0]
 test_a = arousal_df.head(1).to_numpy()[0]
 # test_v = valence_df.head(2).to_numpy()[1]
@@ -47,15 +59,35 @@ test_a = test_a[1::]
 test_v = test_v[1::]
 test_v = test_v[~np.isnan(test_v)]
 
-# print(len(test_v))
-# print(len(test_a))
+af = dict.fromkeys(test[1::])
+test_af = {}
+row = audio_features_df.iloc[0]
+#print(len(audio_features_df))
+for i in range(len(audio_features_df)):
+    row = audio_features_df.iloc[i]
+    test_af[row["frameTime"]] = {
+        "pcm_RMSenergy_sma_amean": row["pcm_RMSenergy_sma_amean"],
+        "valence": test_v[i],
+        "arousal": test_a[i]
+    }
 
-# test = np.column_stack((test_v, test_a))
-#print(test)
+print(test_af)
+
 
 #angles = np.degrees(np.arctan2(test_a[0::], test_v[0::])) % 360
 
 #angle = math.degrees(math.atan2(test_a[0], test_v[0]))
+
+def get_genre_color(genre):
+    match genre:
+        case "Blues": 
+            return "(0,0,255)"
+        case "Classical":
+            return "(255,255,255)"
+        case "Country":
+            return "(0,255,0)"
+        case "Hip-Hop":
+            return "(255,0,0)"
 
 def get_category(angle):
     if angle < 0:
@@ -84,33 +116,8 @@ def get_categories(angles):
         categories.append(get_category(angle))
     return categories
 
-#cats = get_categories(angles)
-
-np.set_printoptions(threshold=np.inf)
-#print(test_v,test_a)
-#print(angle)
-#print(angles)
-#print(cats)
-
-# def normalized_to_pixel_coords(norm_x, norm_y, img_width, img_height):
-#     # Convert normalized coords (-1 to 1 range) to pixel coordinates
-#     px = int((norm_x + 1) / 2 * img_width)
-#     py = int((1 - (norm_y + 1) / 2) * img_height)  # Invert y-axis
-#     return px, py
-
-# # Load image
-# img = Image.open("testImage.png")
-# width, height = img.size
-#
-# # Normalized input coordinates
-# norm_x, norm_y = test_v[-1], test_a[-1]
-#
-# # Convert to pixel coordinates
-# px, py = normalized_to_pixel_coords(norm_x, norm_y, width, height)
-# print(f"Pixel coordinates: ({px}, {py})")
-
 def get_color(x, y):
-    img = Image.open("testImage.png")
+    img = Image.open("tt.png")
     width, height = img.size
 
     pixel_x = int((x + 1) / 2 * width)
@@ -122,44 +129,30 @@ def get_colors(xs, ys):
     for index, x in enumerate(xs):
         colors.append(get_color(x,ys[index]))
     return colors
-# Get RGB at that location
-#rgb = img.getpixel((px, py))
-#rgb = get_colors(test_v, test_a)
-#print(rgb)
-
-# template_file = f"scriptTemplates/{cats[-1]}"
-# new_file = "scripts/TestScript.jwfscript"
-# placeholders = {
-#     "VALENCE": test_v[1]*3,
-#     "AROUSAL": test_a[1]*-2,
-#     "RED": rgb[0],
-#     "GREEN": rgb[1],
-#     "BLUE": rgb[2],
-#     "RMSENERGY": 1.488783,
-# }
 
 
-def generate_script(valence_values, arousal_values):
-    angles = np.degrees(np.arctan2(arousal_values, valence_values)) % 360
-    categories = get_categories(angles)
-    colors = get_colors(valence_values, arousal_values)
+def generate_script(frames):
+    for frame in frames:
+        angle = math.degrees(math.atan2(frames[frame]["arousal"], frames[frame]["valence"]))
+        frames[frame]["category"] = get_category(angle)
+        frames[frame]["color_start"] = (0,0,255)
+        frames[frame]["color_end"] = get_color(frames[frame]["valence"], frames[frame]["arousal"])
 
-    print(angles)
-    print(categories)
-    print(colors)
-
-    template_file = f"scriptTemplates/{categories[-1]}"
+    print(frames)
+    
+    template_file = f"oldTemplates/{frames[44]["category"]}"
     new_file = "scripts/TestScript.jwfscript"
     placeholders = {
-        "VALENCE": valence_values[0] * 3,
-        "AROUSAL": arousal_values[0] * -2,
-        "RED": colors[0][0],
-        "GREEN": colors[0][1],
-        "BLUE": colors[0][2],
-        "RMSENERGY": 1.488783,
+        "VALENCE": frames[44]["valence"] * 3,
+        "AROUSAL": frames[44]["arousal"] * -2,
+        "RED_END": frames[44]["color_end"][0],
+        "GREEN_END": frames[44]["color_end"][1],
+        "BLUE_END": frames[44]["color_end"][2],
+        "RMSENERGY": frames[44]["pcm_RMSenergy_sma_amean"],
+        "COLOR": frames[44]["color_start"]
     }
+    
     write_script(template_file, new_file, placeholders)
 
-#generate_script(test_v, test_a)
+generate_script(test_af)
 
-#write_script(template_file, new_file, placeholders)

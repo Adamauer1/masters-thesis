@@ -1,4 +1,22 @@
-    // create a new flame
+import org.jwildfire.create.tina.base.Flame;
+import org.jwildfire.create.tina.base.XForm;
+import org.jwildfire.create.tina.palette.RGBPalette;
+import org.jwildfire.create.tina.palette.RGBColor;
+import org.jwildfire.create.tina.script.ScriptRunnerEnvironment;
+import org.jwildfire.create.tina.transform.XFormTransformService;
+import org.jwildfire.create.tina.base.Layer;
+import org.jwildfire.create.tina.base.DrawMode;
+import org.jwildfire.create.tina.base.ColorType;
+import org.jwildfire.create.tina.variation.Variation;
+import org.jwildfire.create.tina.variation.VariationFunc;
+import org.jwildfire.create.tina.variation.VariationFuncList;
+import org.jwildfire.create.tina.mutagen.RandomGradientMutation;
+import org.jwildfire.create.tina.transform.XFormTransformService;
+import org.jwildfire.create.tina.base.EditPlane;
+import org.jwildfire.create.tina.variation.Linear3DFunc;
+
+public void run(ScriptRunnerEnvironment pEnv) throws Exception {
+  // create a new flame
     RGBColor startColor = new RGBColorCOLOR;
     RGBColor endColor = new RGBColor(RED_END,GREEN_END,BLUE_END);
     RGBPalette palette = new RGBPalette();
@@ -15,14 +33,14 @@
   
       palette.setColor(i, r, g, b);
     }
-    Flame flameFRAMENUMBER = new Flame();
-    Layer layerFRAMENUMBER = flameFRAMENUMBER.getFirstLayer();
-    flameFRAMENUMBER.setCentreX(0.0);
-    flameFRAMENUMBER.setCentreY(0.0);
-    flameFRAMENUMBER.setPixelsPerUnit(200);
-    layerFRAMENUMBER.getFinalXForms().clear();
-    layerFRAMENUMBER.getXForms().clear();
-    flameFRAMENUMBER.setPalette(palette);
+  Flame flame = new Flame();
+    Layer layer = flame.getFirstLayer();
+    flame.setCentreX(0.0);
+    flame.setCentreY(0.0);
+    flame.setPixelsPerUnit(200);
+    layer.getFinalXForms().clear();
+    layer.getXForms().clear();
+    flame.setPalette(palette);
 
     int maxXForms = (int) (2.0 + Math.random() * 5.0);
     double scl = 1;
@@ -35,7 +53,7 @@
 
     for (int i = 0; i < maxXForms; i++) {
       XForm xForm = new XForm();
-      layerFRAMENUMBER.getXForms().add(xForm);
+      layer.getXForms().add(xForm);
       if (contRot) {
         r0 += 45.0 * Math.random() - 9.0 * Math.random();
         XFormTransformService.rotate(xForm, r0);
@@ -61,10 +79,18 @@
       xForm.addVariation(Math.random() * 0.5 + 0.5, new Linear3DFunc());
       xForm.setWeight(scl * Math.random() * 19.9 + 0.1);
     }
-    
-    File outFileFRAMENUMBER = new File("flames/" + FRAMENUMBER + ".flame");
-        try {
-          new FlameWriter().writeFlame(flame, outFileFRAMENUMBER.getAbsolutePath());
-        } catch (Exception ex) {
-          System.err.println("Error writing flame " + FRAMENUMBER + ": " + ex.getMessage());
-        }
+
+
+  
+  // Either update the currently selected flame (to not need to create a new thumbnail
+  // in the thumbnail ribbon after each run of the script...
+  Flame selFlame = pEnv.getCurrFlame();
+  if(selFlame!=null) {
+    selFlame.assign(flame);
+    pEnv.refreshUI();
+  }
+  // ...or load the flame in the editor and refresh the UI
+  else {
+    pEnv.setCurrFlame(flame);
+  }
+}
