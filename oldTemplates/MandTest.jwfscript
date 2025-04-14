@@ -82,7 +82,8 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
         xForm.addVariation(-1.0 + Math.random() * 2.0, VariationFuncList.getVariationFuncInstance(VariationFuncList.getRandomVariationname(), true));
       }
       xForm.getModifiedWeights()[1] = Math.random() < 0.5 ? 0.0 : Math.random();
-      XFormTransformService.scale(xForm, 0.5 + Math.random() * 0.5, Math.random() < 0.5, Math.random() < 0.5);
+      //XFormTransformService.scale(xForm, 0.5 + Math.random() * 0.5, Math.random() < 0.5, Math.random() < 0.5);
+      XFormTransformService.scale(xForm, RMSENERGY * 10, true, true);
       //randomAffine(xForm);
     }
     // 3rd xForm

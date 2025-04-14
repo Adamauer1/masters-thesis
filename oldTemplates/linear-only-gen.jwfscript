@@ -43,7 +43,7 @@ public void run(ScriptRunnerEnvironment pEnv) throws Exception {
     flame.setPalette(palette);
 
     int maxXForms = (int) (2.0 + Math.random() * 5.0);
-    double scl = 1;
+    double scl = RMSENERGY * 10;
     double tsclX = VALENCE * 10;
     double tsclY = AROUSAL * 10;
 
