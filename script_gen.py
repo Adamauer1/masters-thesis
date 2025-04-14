@@ -1,5 +1,4 @@
 import math
-
 from PIL import Image
 import numpy as np
 import pandas as pd
@@ -139,17 +138,17 @@ def generate_script(frames):
         frames[frame]["color_end"] = get_color(frames[frame]["valence"], frames[frame]["arousal"])
 
     print(frames)
-    
-    template_file = f"oldTemplates/{frames[44]["category"]}"
+    # frame time starts at 15 and goes to 44
+    template_file = f"oldTemplates/{frames[25]["category"]}"
     new_file = "scripts/TestScript.jwfscript"
     placeholders = {
-        "VALENCE": frames[44]["valence"] * 3,
-        "AROUSAL": frames[44]["arousal"] * -2,
-        "RED_END": frames[44]["color_end"][0],
-        "GREEN_END": frames[44]["color_end"][1],
-        "BLUE_END": frames[44]["color_end"][2],
-        "RMSENERGY": frames[44]["pcm_RMSenergy_sma_amean"],
-        "COLOR": frames[44]["color_start"]
+        "VALENCE": frames[25]["valence"] * 3,
+        "AROUSAL": frames[25]["arousal"] * -2,
+        "RED_END": frames[25]["color_end"][0],
+        "GREEN_END": frames[25]["color_end"][1],
+        "BLUE_END": frames[25]["color_end"][2],
+        "RMSENERGY": frames[25]["pcm_RMSenergy_sma_amean"],
+        "COLOR": frames[25]["color_start"]
     }
     
     write_script(template_file, new_file, placeholders)
