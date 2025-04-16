@@ -10,10 +10,13 @@ import org.jwildfire.create.tina.base.ColorType;
 import org.jwildfire.create.tina.variation.*;
 //import org.jwildfire.create.tina.variation.VariationFunc;
 //import org.jwildfire.create.tina.variation.VariationFuncList;
-import org.jwildfire.create.tina.mutagen.RandomGradientMutation;
+//import org.jwildfire.create.tina.mutagen.RandomGradientMutation;
 import org.jwildfire.create.tina.transform.XFormTransformService;
 import org.jwildfire.create.tina.base.EditPlane;
 //import org.jwildfire.create.tina.variation.Linear3DFunc;
 import org.jwildfire.create.tina.io.*;
-
+import org.jwildfire.base.Tools;
+import static org.jwildfire.base.mathlib.MathLib.M_PI;
+import org.jwildfire.create.tina.mutagen.*;
+//import org.jwildfire.create.tina.randomflame.ExperimentalSimpleRandomFlameGenerator;
 public void run(ScriptRunnerEnvironment pEnv) throws Exception {

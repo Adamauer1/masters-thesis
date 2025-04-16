@@ -1,22 +1,23 @@
-
-  // create a new flame
-    RGBColor startColor = new RGBColorCOLOR;
-    RGBColor endColor = new RGBColor(RED_END,GREEN_END,BLUE_END);
+// Linear Only Generator
+public Flame LinearOnlyGen(int frameNumber, double valence, double arousal, int rS, int gS, int bS, int rE, int gE, int bE, double rmsEnergy) throws Exception {
+    // create a new flame
+    RGBColor startColor = new RGBColor(rS,gS,bS);
+    RGBColor endColor = new RGBColor(rE,gE,bE);
     RGBPalette palette = new RGBPalette();
      for (int i = 0; i < RGBPalette.PALETTE_SIZE; i++) {
          float t = (float)i / (RGBPalette.PALETTE_SIZE - 1);
-  
+
       // Optionally add randomness to interpolation
       float jitter = 0.1f * (float)Math.random();
       t = Math.min(1.0f, Math.max(0.0f, t + (Math.random() < 0.5 ? -jitter : jitter)));
-  
+
       int r = (int)(startColor.getRed()   + t * (endColor.getRed()   - startColor.getRed()));
       int g = (int)(startColor.getGreen() + t * (endColor.getGreen() - startColor.getGreen()));
       int b = (int)(startColor.getBlue()  + t * (endColor.getBlue()  - startColor.getBlue()));
-  
+
       palette.setColor(i, r, g, b);
     }
-  Flame flame = new Flame();
+    Flame flame = new Flame();
     Layer layer = flame.getFirstLayer();
     flame.setCentreX(0.0);
     flame.setCentreY(0.0);
@@ -26,9 +27,9 @@
     flame.setPalette(palette);
 
     int maxXForms = (int) (2.0 + Math.random() * 5.0);
-    double scl = RMSENERGY * 10;
-    double tsclX = VALENCE * 10;
-    double tsclY = AROUSAL * 10;
+    double scl = rmsEnergy * 10;
+    double tsclX = valence * 10;
+    double tsclY = arousal * 10;
 
     boolean contRot = Math.random() < 0.5;
     double r0 = 0;
@@ -62,4 +63,15 @@
       xForm.addVariation(Math.random() * 0.5 + 0.5, new Linear3DFunc());
       xForm.setWeight(scl * Math.random() * 19.9 + 0.1);
     }
+
+    //File outFile = new File("flames/" + frameNumber + ".flame");
+        try {
+          //new FlameWriter().writeFlame(flame, outFile.getAbsolutePath());
+          new FlameWriter().writeFlame(flame, "flames/" + frameNumber + ".flame");
+        } catch (Exception ex) {
+          System.err.println("Error writing flame " + frameNumber + ": " + ex.getMessage());
+        }
+
+    return flame;
+}
 

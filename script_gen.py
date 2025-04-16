@@ -70,7 +70,7 @@ for i in range(len(audio_features_df)):
         "arousal": test_a[i]
     }
 
-print(test_af)
+#print(test_af)
 
 
 #angles = np.degrees(np.arctan2(test_a[0::], test_v[0::])) % 360
@@ -101,9 +101,9 @@ def get_category(angle):
     elif 135 <= angle < 180:
         return "synth-gen.jwfscript"  # 7
     elif 180 <= angle < 225:
-        return "linear-only-gen.jwfscript"  # 6
+        return "LinearOnlyGen"  # 6
     elif 225 <= angle < 270:
-        return "MandTest.jwfscript"  # 5
+        return "MandGen"  # 5
     elif 270 <= angle < 315:
         return "JulianTest.jwfscript"  # 4
     else:  # 315 <= angle < 360
@@ -130,28 +130,111 @@ def get_colors(xs, ys):
     return colors
 
 
-def generate_script(frames):
-    for frame in frames:
-        angle = math.degrees(math.atan2(frames[frame]["arousal"], frames[frame]["valence"]))
-        frames[frame]["category"] = get_category(angle)
-        frames[frame]["color_start"] = (0,0,255)
-        frames[frame]["color_end"] = get_color(frames[frame]["valence"], frames[frame]["arousal"])
+def generate_script(audio_frames):
+    video_frames = {}
+    frame_count = 0
+    last_category = ""
+    energy_mean = 0
+    for audio_frame in audio_frames:
+        angle = math.degrees(math.atan2(audio_frames[audio_frame]["arousal"], audio_frames[audio_frame]["valence"]))
+        audio_frames[audio_frame]["category"] = get_category(angle)
+        audio_frames[audio_frame]["color_start"] = (0,0,255)
+        audio_frames[audio_frame]["color_end"] = get_color(audio_frames[audio_frame]["valence"], audio_frames[audio_frame]["arousal"])
+        #if frame_count > 3:
+            # generate new video frame
+            #frame_count = 0
+      # if last_category != audio_frames[audio_frame]["category"]:
+           # generate new video frame
 
-    print(frames)
+
+        frame_count += 1
+
+
+    print(video_frames)
     # frame time starts at 15 and goes to 44
-    template_file = f"oldTemplates/{frames[25]["category"]}"
+
+    template_file = f"oldTemplates/{audio_frames[44]["category"]}"
     new_file = "scripts/TestScript.jwfscript"
-    placeholders = {
-        "VALENCE": frames[25]["valence"] * 3,
-        "AROUSAL": frames[25]["arousal"] * -2,
-        "RED_END": frames[25]["color_end"][0],
-        "GREEN_END": frames[25]["color_end"][1],
-        "BLUE_END": frames[25]["color_end"][2],
-        "RMSENERGY": frames[25]["pcm_RMSenergy_sma_amean"],
-        "COLOR": frames[25]["color_start"]
-    }
+    header_file = "scriptTemplates/header.txt"
+    footer_file = "scriptTemplates/footer.txt"
+    # placeholders = {
+    #     "VALENCE": frames[25]["valence"] * 3,
+    #     "AROUSAL": frames[25]["arousal"] * -2,
+    #     "RED_END": frames[25]["color_end"][0],
+    #     "GREEN_END": frames[25]["color_end"][1],
+    #     "BLUE_END": frames[25]["color_end"][2],
+    #     "RMSENERGY": frames[25]["pcm_RMSenergy_sma_amean"],
+    #     "COLOR": frames[25]["color_start"]
+    # }
+    with open(new_file, 'w') as outfile:
+        with open(header_file, 'r') as infile:
+            content = infile.read()
+            outfile.write(f"// begin header section\n")
+            outfile.write(content)
+            outfile.write(f"\n// end header section\n")
+
+        outfile.write(f"\n")
+        #outfile.write(f"LinearOnlyGen(0, {placeholders["VALENCE"]}, {placeholders["AROUSAL"]}, {placeholders["COLOR"][0]}, {placeholders["COLOR"][1]}, {placeholders["COLOR"][2]}, {placeholders["RED_END"]}, {placeholders["GREEN_END"]}, {placeholders["BLUE_END"]}, {placeholders["RMSENERGY"]});")
+
+        for idx, audio_frame in enumerate(audio_frames):
+            #print(frame)
+            placeholders = {
+                "FRAME_NUMBER": idx,
+                "VALENCE": audio_frames[audio_frame]["valence"] * 3,
+                "AROUSAL": audio_frames[audio_frame]["arousal"] * -2,
+                "RED_END": audio_frames[audio_frame]["color_end"][0],
+                "GREEN_END": audio_frames[audio_frame]["color_end"][1],
+                "BLUE_END": audio_frames[audio_frame]["color_end"][2],
+                "RMSENERGY": audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"],
+                "COLOR": audio_frames[audio_frame]["color_start"]
+            }
+            # with open(f"scriptTemplates/{frames[frame]["category"]}") as infile:
+            #     content = infile.read()
+            #     try:
+            #         for placeholder, value in placeholders.items():
+            #             content = content.replace(placeholder, str(value))
+            #     except KeyError as e:
+            #         print(f"Error: {e}")
+            #outfile.write("\n")
+            #outfile.write(f'{audio_frames[audio_frame]["category"]}({idx},{audio_frames[audio_frame]["valence"] * 3}, {audio_frames[audio_frame]["arousal"] * -2}, {audio_frames[audio_frame]["color_start"][0]}, {audio_frames[audio_frame]["color_start"][1]}, {audio_frames[audio_frame]["color_start"][2]}, {audio_frames[audio_frame]["color_end"][0]}, {audio_frames[audio_frame]["color_end"][1]}, {audio_frames[audio_frame]["color_end"][2]}, {audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]});')
+            outfile.write(f'GalaxiesGen({idx},{audio_frames[audio_frame]["valence"] * 3}, {audio_frames[audio_frame]["arousal"] * -2}, {audio_frames[audio_frame]["color_start"][0]}, {audio_frames[audio_frame]["color_start"][1]}, {audio_frames[audio_frame]["color_start"][2]}, {audio_frames[audio_frame]["color_end"][0]}, {audio_frames[audio_frame]["color_end"][1]}, {audio_frames[audio_frame]["color_end"][2]}, {audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]});')
+            outfile.write("\n")
+
+        with open(footer_file, 'r') as infile:
+            content = infile.read()
+            outfile.write(f"\n// begin footer section\n")
+            outfile.write(content)
+            outfile.write(f"\n// end footer section")
+
+        with open(f"scriptTemplates/mandelbrot_gen.txt", 'r') as infile:
+            content = infile.read()
+            # try:
+            #     for placeholder, value in placeholders.items():
+            #         content = content.replace(placeholder, str(value))
+            # except KeyError as e:
+            #     print(f"Error: {e}")
+            outfile.write("\n// start linear only gen flame\n")
+            outfile.write(content)
+            outfile.write("\n// end linear only gen flame\n")
+
+        with open(f"scriptTemplates/galaxies_gen.txt", 'r') as infile:
+            content = infile.read()
+            # try:
+            #     for placeholder, value in placeholders.items():
+            #         content = content.replace(placeholder, str(value))
+            # except KeyError as e:
+            #     print(f"Error: {e}")
+            outfile.write("\n// start linear only gen flame\n")
+            outfile.write(content)
+            outfile.write("\n// end linear only gen flame\n")
+
+        with open(f"scriptTemplates/palette_gen.txt", 'r') as infile:
+            content = infile.read()
+            outfile.write("\n")
+            outfile.write(content)
+
     
-    write_script(template_file, new_file, placeholders)
+    #write_script(template_file, new_file, placeholders)
 
 generate_script(test_af)
 

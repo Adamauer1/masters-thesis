@@ -2,11 +2,11 @@
   // in the thumbnail ribbon after each run of the script...
   Flame selFlame = pEnv.getCurrFlame();
   if(selFlame!=null) {
-    selFlame.assign(flame);
+    //selFlame.assign(flame);
     pEnv.refreshUI();
   }
   // ...or load the flame in the editor and refresh the UI
   else {
-    pEnv.setCurrFlame(flame);
+    //pEnv.setCurrFlame(flame);
   }
 }
