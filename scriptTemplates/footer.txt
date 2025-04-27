@@ -9,4 +9,19 @@
   else {
     //pEnv.setCurrFlame(flame);
   }
+  //Flame[] flames = new Flame[danceProject.getFlames().size()];
+  //danceProject.getFlames().toArray(flames);
+  //danceProject.setSoundFilename(player, "2.mp3");
+  //DefaultMotionCreator creator = new DefaultMotionCreator();
+  //creator.createMotions(danceProject);
+  //danceProject.getMotions().add(SetSawToothMotion(flames));
+  //danceProject.getMotions().add(SetFFTMotions(flames, "layer1.density", 1, 0, 0));
+  //danceWriter.writeProject(danceProject, "tDance.jwfdance");
+  //FlameMovie flameMovie = new FlameMovie(Prefs.getPrefs());
+  flameMovie.getGlobalScripts()[0] = new GlobalScript(GlobalScriptType.ROTATE_ROLL, 1);
+  flameMovie.getxFormScripts()[0] = new XFormScript(XFormScriptType.ROTATE_FINAL_XFORM, 1);
+  flameMovie.getxFormScripts()[1] = new XFormScript(XFormScriptType.ROTATE_POST_FINAL_XFORM, 1);
+  flameMovie.getxFormScripts()[2] = new XFormScript(XFormScriptType.ROTATE_FULL, 1);
+  FlameMovieWriter flameMovieWriter = new FlameMovieWriter();
+  flameMovieWriter.writeFlame(flameMovie, "test.jwfrender");
 }

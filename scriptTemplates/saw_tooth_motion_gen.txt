@@ -1,0 +1,9 @@
+public SawToothMotion SetSawToothMotion(Flame[] flames){
+  SawToothMotion motion = new SawToothMotion();
+  for (int i = 0; i < flames.length; i++){
+     motion.getMotionLinks().add(new MotionLink( new FlamePropertyPath(flames[i], "camRoll")));
+  }
+  motion.setFrequency(3);
+  motion.setMaxValue(360);
+  return motion;
+}

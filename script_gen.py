@@ -33,7 +33,7 @@ arousal_df = pd.read_csv(arousal_file_path)
 valence_file_path = "Data/deam/valence.csv"
 valence_df = pd.read_csv(valence_file_path)
 
-audio_features_df = pd.read_csv("Data/deam/2.csv", delimiter=";")
+audio_features_df = pd.read_csv("Data/deam/audio_features/2.csv", delimiter=";")
 mask = (audio_features_df.index >= 30) & (audio_features_df.index <= 89)
 audio_features_df = audio_features_df[mask]
 #print(audio_features_df)
@@ -58,7 +58,9 @@ test_a = test_a[1::]
 test_v = test_v[1::]
 test_v = test_v[~np.isnan(test_v)]
 
-af = dict.fromkeys(test[1::])
+#af = dict.fromkeys(test[1::])
+#print(af)
+end_time = 0
 test_af = {}
 row = audio_features_df.iloc[0]
 #print(len(audio_features_df))
@@ -66,11 +68,15 @@ for i in range(len(audio_features_df)):
     row = audio_features_df.iloc[i]
     test_af[row["frameTime"]] = {
         "pcm_RMSenergy_sma_amean": row["pcm_RMSenergy_sma_amean"],
+        "pcm_RMSenergy_sma_stddev": row["pcm_RMSenergy_sma_stddev"],
         "valence": test_v[i],
         "arousal": test_a[i]
     }
-
-#print(test_af)
+    if i == len(audio_features_df)-1:
+        end_time = row["frameTime"] + 0.5
+        
+print(test_af)
+print(end_time)
 
 
 #angles = np.degrees(np.arctan2(test_a[0::], test_v[0::])) % 360
@@ -132,27 +138,77 @@ def get_colors(xs, ys):
 
 def generate_script(audio_frames):
     video_frames = {}
-    frame_count = 0
+    frame_index = 0
+    reset_frame_counter = 0
     last_category = ""
-    energy_mean = 0
+    energy_mean = np.float64(0)
+    energy_std = 0
     for audio_frame in audio_frames:
         angle = math.degrees(math.atan2(audio_frames[audio_frame]["arousal"], audio_frames[audio_frame]["valence"]))
+        audio_frames[audio_frame]["startTime"] = audio_frame
         audio_frames[audio_frame]["category"] = get_category(angle)
         audio_frames[audio_frame]["color_start"] = (0,0,255)
         audio_frames[audio_frame]["color_end"] = get_color(audio_frames[audio_frame]["valence"], audio_frames[audio_frame]["arousal"])
-        #if frame_count > 3:
-            # generate new video frame
-            #frame_count = 0
-      # if last_category != audio_frames[audio_frame]["category"]:
-           # generate new video frame
+        print(energy_mean)
+        if reset_frame_counter > 4:
+            #generate new video frame
+            print("change video frame due to timeout")
+            last_category = audio_frames[audio_frame]["category"]
+            video_frames[frame_index] = audio_frames[audio_frame]
+            if frame_index != 0:
+                video_frames[frame_index-1]["endTime"] = video_frames[frame_index]["startTime"]
+            temp_energy = audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]
+            if energy_mean != 0:
+                video_frames[frame_index]["pcm_RMSenergy_sma_amean"] = energy_mean
+            energy_mean = temp_energy
+            frame_index += 1
+            reset_frame_counter = 0
+        elif last_category != audio_frames[audio_frame]["category"]:
+            #generate new video frame
+            last_category = audio_frames[audio_frame]["category"]
+            video_frames[frame_index] = audio_frames[audio_frame]
+            if frame_index != 0:
+                video_frames[frame_index-1]["endTime"] = video_frames[frame_index]["startTime"]
+            temp_energy = audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]
+            if energy_mean != 0:
+                video_frames[frame_index]["pcm_RMSenergy_sma_amean"] = energy_mean
+            energy_mean = temp_energy
+            frame_index += 1
+            print("change video frame due to category change")
+            reset_frame_counter = 0
+        
+        elif math.fabs(energy_mean - audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]) > audio_frames[audio_frame]["pcm_RMSenergy_sma_stddev"]:
+            #generate new video frame
+            last_category = audio_frames[audio_frame]["category"]
+            video_frames[frame_index] = audio_frames[audio_frame]
+            if frame_index != 0:
+                video_frames[frame_index-1]["endTime"] = video_frames[frame_index]["startTime"]
+            temp_energy = audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]
+            if energy_mean != 0:
+                video_frames[frame_index]["pcm_RMSenergy_sma_amean"] = energy_mean
+            energy_mean = temp_energy
+            frame_index += 1
+            print("change video frame due to large change in energy")
+            reset_frame_counter = 0
+        else:
+            # keep current video frame and update mean and std value
+            if reset_frame_counter != 0:
+                energy_mean = energy_mean * (reset_frame_counter-1)/reset_frame_counter + audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"] / reset_frame_counter
+            else:
+                energy_mean = audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]
+            #energy_std = (energy_std + audio_frames[audio_frame]["pcm_RMSenergy_sma_stddev"])/2
 
+        reset_frame_counter += 1
 
-        frame_count += 1
-
-
+    video_frames[frame_index-1]["endTime"] = end_time
+    for video_frame in video_frames:
+        video_frames[video_frame]["frame_count"] = (video_frames[video_frame]["endTime"] - video_frames[video_frame]["startTime"]) * 24
+    print(frame_index)
     print(video_frames)
     # frame time starts at 15 and goes to 44
-
+    # for idx, video_frame in enumerate(video_frames):
+    #     if idx+1 != len(video_frames):
+    #         video_frames[video_frame]["end_time"] = video_frames[idx+1]
     template_file = f"oldTemplates/{audio_frames[44]["category"]}"
     new_file = "scripts/TestScript.jwfscript"
     header_file = "scriptTemplates/header.txt"
@@ -176,18 +232,18 @@ def generate_script(audio_frames):
         outfile.write(f"\n")
         #outfile.write(f"LinearOnlyGen(0, {placeholders["VALENCE"]}, {placeholders["AROUSAL"]}, {placeholders["COLOR"][0]}, {placeholders["COLOR"][1]}, {placeholders["COLOR"][2]}, {placeholders["RED_END"]}, {placeholders["GREEN_END"]}, {placeholders["BLUE_END"]}, {placeholders["RMSENERGY"]});")
 
-        for idx, audio_frame in enumerate(audio_frames):
+        for idx, video_frame in enumerate(video_frames):
             #print(frame)
-            placeholders = {
-                "FRAME_NUMBER": idx,
-                "VALENCE": audio_frames[audio_frame]["valence"] * 3,
-                "AROUSAL": audio_frames[audio_frame]["arousal"] * -2,
-                "RED_END": audio_frames[audio_frame]["color_end"][0],
-                "GREEN_END": audio_frames[audio_frame]["color_end"][1],
-                "BLUE_END": audio_frames[audio_frame]["color_end"][2],
-                "RMSENERGY": audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"],
-                "COLOR": audio_frames[audio_frame]["color_start"]
-            }
+            # placeholders = {
+            #     "FRAME_NUMBER": idx,
+            #     "VALENCE": video_frames[video_frame]["valence"] * 3,
+            #     "AROUSAL": video_frames[video_frame]["arousal"] * -2,
+            #     "RED_END": video_frames[video_frame]["color_end"][0],
+            #     "GREEN_END": video_frames[video_frame]["color_end"][1],
+            #     "BLUE_END": video_frames[video_frame]["color_end"][2],
+            #     "RMSENERGY": video_frames[video_frame]["pcm_RMSenergy_sma_amean"],
+            #     "COLOR": video_frames[video_frame]["color_start"]
+            # }
             # with open(f"scriptTemplates/{frames[frame]["category"]}") as infile:
             #     content = infile.read()
             #     try:
@@ -197,9 +253,9 @@ def generate_script(audio_frames):
             #         print(f"Error: {e}")
             #outfile.write("\n")
             #outfile.write(f'{audio_frames[audio_frame]["category"]}({idx},{audio_frames[audio_frame]["valence"] * 3}, {audio_frames[audio_frame]["arousal"] * -2}, {audio_frames[audio_frame]["color_start"][0]}, {audio_frames[audio_frame]["color_start"][1]}, {audio_frames[audio_frame]["color_start"][2]}, {audio_frames[audio_frame]["color_end"][0]}, {audio_frames[audio_frame]["color_end"][1]}, {audio_frames[audio_frame]["color_end"][2]}, {audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]});')
-            outfile.write(f'GalaxiesGen({idx},{audio_frames[audio_frame]["valence"] * 3}, {audio_frames[audio_frame]["arousal"] * -2}, {audio_frames[audio_frame]["color_start"][0]}, {audio_frames[audio_frame]["color_start"][1]}, {audio_frames[audio_frame]["color_start"][2]}, {audio_frames[audio_frame]["color_end"][0]}, {audio_frames[audio_frame]["color_end"][1]}, {audio_frames[audio_frame]["color_end"][2]}, {audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]});')
+            outfile.write(f'AddFlameMoviePart(flameMovie, {video_frames[video_frame]["category"]}({idx},{video_frames[video_frame]["valence"] * 3}, {video_frames[video_frame]["arousal"] * -2}, {video_frames[video_frame]["color_start"][0]}, {video_frames[video_frame]["color_start"][1]}, {video_frames[video_frame]["color_start"][2]}, {video_frames[video_frame]["color_end"][0]}, {video_frames[video_frame]["color_end"][1]}, {video_frames[video_frame]["color_end"][2]}, {video_frames[video_frame]["pcm_RMSenergy_sma_amean"]}), {int(video_frames[video_frame]["frame_count"])});')
             outfile.write("\n")
-
+        outfile.write(f'flameMovie.getGlobalScripts()[0] = new GlobalScript(GlobalScriptType.ROTATE_ROLL, 1);')
         with open(footer_file, 'r') as infile:
             content = infile.read()
             outfile.write(f"\n// begin footer section\n")
@@ -217,7 +273,7 @@ def generate_script(audio_frames):
             outfile.write(content)
             outfile.write("\n// end linear only gen flame\n")
 
-        with open(f"scriptTemplates/galaxies_gen.txt", 'r') as infile:
+        with open(f"scriptTemplates/linear_only_gen.txt", 'r') as infile:
             content = infile.read()
             # try:
             #     for placeholder, value in placeholders.items():
@@ -232,6 +288,19 @@ def generate_script(audio_frames):
             content = infile.read()
             outfile.write("\n")
             outfile.write(content)
+        with open(f"scriptTemplates/fft_motion_gen.txt", 'r') as infile:
+            content = infile.read()
+            outfile.write("\n")
+            outfile.write(content)
+        with open(f"scriptTemplates/saw_tooth_motion_gen.txt", 'r') as infile:
+            content = infile.read()
+            outfile.write("\n")
+            outfile.write(content)
+        with open(f"scriptTemplates/add_flame_movie_part.txt", 'r') as infile:
+            content = infile.read()
+            outfile.write("\n")
+            outfile.write(content)
+    
 
     
     #write_script(template_file, new_file, placeholders)

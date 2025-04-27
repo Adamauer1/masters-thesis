@@ -1,0 +1,9 @@
+public void AddFlameMoviePart(FlameMovie flameMovie, Flame flame, int frameCount){
+    FlameMoviePart flameMoviePart = new FlameMoviePart();
+    flameMoviePart.setFlame(flame);
+    flameMoviePart.setFrameCount(frameCount);
+    flameMoviePart.setFrameMorphCount(6);
+    flameMoviePart.setFlameMorphType(FlameMorphType.MORPH);
+    flameMovie.addPart(flameMoviePart);
+    //return flameMoviePart;
+}
