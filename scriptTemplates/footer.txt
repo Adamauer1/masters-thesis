@@ -18,7 +18,7 @@
   //danceProject.getMotions().add(SetFFTMotions(flames, "layer1.density", 1, 0, 0));
   //danceWriter.writeProject(danceProject, "tDance.jwfdance");
   //FlameMovie flameMovie = new FlameMovie(Prefs.getPrefs());
-  flameMovie.getGlobalScripts()[0] = new GlobalScript(GlobalScriptType.ROTATE_ROLL, 1);
+  //flameMovie.getGlobalScripts()[0] = new GlobalScript(GlobalScriptType.ROTATE_ROLL, 1);
   flameMovie.getxFormScripts()[0] = new XFormScript(XFormScriptType.ROTATE_FINAL_XFORM, 1);
   flameMovie.getxFormScripts()[1] = new XFormScript(XFormScriptType.ROTATE_POST_FINAL_XFORM, 1);
   flameMovie.getxFormScripts()[2] = new XFormScript(XFormScriptType.ROTATE_FULL, 1);

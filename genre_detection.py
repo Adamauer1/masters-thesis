@@ -18,7 +18,8 @@ def prepare_data(targets):
         if file_name == "jazz.00054.wav":
             continue
         audio_features_df = pd.read_csv(f"Data/audio_features/genre_set/{file_name[:-4]}.csv", delimiter=",")
-        X.append(audio_features_df.to_numpy()[0])
+        
+        X.append(audio_features_df.to_numpy()[0][1:])
         y.append(target[59])
         
     print(len(X))

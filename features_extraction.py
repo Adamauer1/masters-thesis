@@ -36,6 +36,9 @@ def load_audio(file_path, sr=44100):
 # 
 #     return feature_df
 
+def extract_bpm(y, sr):
+    tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
+    return tempo
 
 def extract_features(y, sr, window_duration):
     frame_length = int(0.060 * sr)  # 60ms
@@ -116,11 +119,11 @@ def is_valid_audio(file_path):
             return True
     except (RuntimeError, sf.LibsndfileError):
         return False
-if is_valid_audio(file_path):
-    y = load_audio(file_path)
-else:
-    print(f"Invalid or corrupted audio file: {file_path}")
-    y = None
+# if is_valid_audio(file_path):
+#     y = load_audio(file_path)
+# else:
+#     print(f"Invalid or corrupted audio file: {file_path}")
+#     y = None
 
 # try:
 #     y = load_audio("Data/audio_files/genre_set/jazz.00054.wav")
@@ -154,21 +157,21 @@ else:
 #     features_df.to_csv(f'Data/audio_features/emotion_set/{csv_file[:4]}.csv', index=False)
 # 
 
-folder_path = "Data/audio_files/genre_set"
-csv_files = sorted(
-    [f for f in os.listdir(folder_path) if f.endswith('.wav')],
-    key=lambda x: int(re.findall(r'\d+', x)[0])
-)
-
-print(csv_files)
+# folder_path = "Data/audio_files/genre_set"
+# csv_files = sorted(
+#     [f for f in os.listdir(folder_path) if f.endswith('.wav')],
+#     key=lambda x: int(re.findall(r'\d+', x)[0])
+# )
 # 
-for csv_file in csv_files:
-    #print(csv_file)
-    if not is_valid_audio(f"Data/audio_files/genre_set/{csv_file}"):
-        print(f"Invalid or corrupted audio file: {csv_file}")
-        continue
-        
-    y = load_audio(f"Data/audio_files/genre_set/{csv_file}", 22050)
-    y = librosa.resample(y=y, orig_sr=22050, target_sr=44100)
-    features_df = extract_features(y, sr=44100, window_duration=len(y)//44100)
-    features_df.to_csv(f'Data/audio_features/genre_set/{csv_file[:-4]}.csv', index=False)
+# print(csv_files)
+# # 
+# for csv_file in csv_files:
+#     #print(csv_file)
+#     if not is_valid_audio(f"Data/audio_files/genre_set/{csv_file}"):
+#         print(f"Invalid or corrupted audio file: {csv_file}")
+#         continue
+#         
+#     y = load_audio(f"Data/audio_files/genre_set/{csv_file}", 22050)
+#     y = librosa.resample(y=y, orig_sr=22050, target_sr=44100)
+#     features_df = extract_features(y, sr=44100, window_duration=len(y)//44100)
+#     features_df.to_csv(f'Data/audio_features/genre_set/{csv_file[:-4]}.csv', index=False)
