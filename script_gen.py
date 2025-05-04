@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import librosa
 import joblib
+from sklearn.utils import column_or_1d
+
 from features_extraction import extract_features, extract_bpm
 
 
@@ -40,7 +42,7 @@ def get_genre_color(genre):
             return [255,255,255]
         case "country":
             return [0,255,0]
-        case "hip-hop":
+        case "hiphop":
             return [255,0,0]
         case "disco":
             return [0,255,255]
@@ -52,6 +54,8 @@ def get_genre_color(genre):
             return [255,192,203]
         case "reggae":
             return [255, 165, 0]
+        case "rock":
+            return [255,0,0]
 
 def get_category(angle):
     if angle < 0:
@@ -60,7 +64,7 @@ def get_category(angle):
     if 0 <= angle < 45:
         return "JulianGen"  # 2
     elif 45 <= angle < 90:
-        return "EDiscGen"  # 1
+        return "BrokatGen"  # 1
     elif 90 <= angle < 135:
         return "SynthGen"  # 8
     elif 135 <= angle < 180:
@@ -81,7 +85,7 @@ def get_categories(angles):
     return categories
 
 def get_color(x, y):
-    img = Image.open("tt.png")
+    img = Image.open("tt.png") #tt
     width, height = img.size
 
     pixel_x = int((x + 1) / 2 * width)
@@ -95,7 +99,7 @@ def get_colors(xs, ys):
     return colors
 
 
-def generate_script(song_data):
+def generate_script(song_data, output_script_name):
     video_frames = {}
     frame_index = 0
     reset_frame_counter = 0
@@ -103,14 +107,14 @@ def generate_script(song_data):
     energy_mean = np.float64(0)
     energy_std = 0
     audio_frames = song_data["audio_frames"]
-    print(audio_frames)
+    #print(audio_frames)
     for audio_frame in audio_frames:
         angle = math.degrees(math.atan2(audio_frames[audio_frame]["arousal"], audio_frames[audio_frame]["valence"]))
         audio_frames[audio_frame]["startTime"] = audio_frame
         audio_frames[audio_frame]["category"] = get_category(angle)
         audio_frames[audio_frame]["color_start"] = get_genre_color(song_data["genre"])
         audio_frames[audio_frame]["color_end"] = get_color(audio_frames[audio_frame]["valence"], audio_frames[audio_frame]["arousal"])
-        print(energy_mean)
+        #print(energy_mean)
         if reset_frame_counter > 10:
             #generate new video frame
             print("change video frame due to timeout")
@@ -119,8 +123,8 @@ def generate_script(song_data):
             if frame_index != 0:
                 video_frames[frame_index-1]["endTime"] = video_frames[frame_index]["startTime"]
             temp_energy = audio_frames[audio_frame]["rms_mean"]
-            if energy_mean != 0:
-                video_frames[frame_index]["rms_mean"] = energy_mean
+            #if energy_mean != 0:
+                #video_frames[frame_index]["rms_mean"] = energy_mean
             energy_mean = temp_energy
             frame_index += 1
             reset_frame_counter = 0
@@ -131,8 +135,8 @@ def generate_script(song_data):
             if frame_index != 0:
                 video_frames[frame_index-1]["endTime"] = video_frames[frame_index]["startTime"]
             temp_energy = audio_frames[audio_frame]["rms_mean"]
-            if energy_mean != 0:
-                video_frames[frame_index]["rms_mean"] = energy_mean
+            #if energy_mean != 0:
+                #video_frames[frame_index]["rms_mean"] = energy_mean
             energy_mean = temp_energy
             frame_index += 1
             print("change video frame due to category change")
@@ -164,14 +168,14 @@ def generate_script(song_data):
     video_frames[frame_index-1]["endTime"] = song_data["song_length"]
     for video_frame in video_frames:
         video_frames[video_frame]["frame_count"] = (video_frames[video_frame]["endTime"] - video_frames[video_frame]["startTime"]) * 24
-    print(frame_index)
-    print(video_frames)
+    #print(frame_index)
+    #print(video_frames)
     # frame time starts at 15 and goes to 44
     # for idx, video_frame in enumerate(video_frames):
     #     if idx+1 != len(video_frames):
     #         video_frames[video_frame]["end_time"] = video_frames[idx+1]
     #template_file = f"oldTemplates/{audio_frames[44]["category"]}"
-    new_file = "scripts/TestScript.jwfscript"
+    new_file = f"scripts/{output_script_name}.jwfscript"
     header_file = "scriptTemplates/header.txt"
     footer_file = "scriptTemplates/footer.txt"
     # placeholders = {
@@ -246,16 +250,16 @@ def generate_script(song_data):
             outfile.write(content)
             outfile.write("\n// end linear only gen flame\n")
 
-        with open(f"scriptTemplates/e_disc_gen.txt", 'r') as infile:
+        with open(f"scriptTemplates/brokat_gen.txt", 'r') as infile:
             content = infile.read()
             # try:
             #     for placeholder, value in placeholders.items():
             #         content = content.replace(placeholder, str(value))
             # except KeyError as e:
             #     print(f"Error: {e}")
-            outfile.write("\n// start e_disc_gen flame\n")
+            outfile.write("\n// start brokat_gen flame\n")
             outfile.write(content)
-            outfile.write("\n// end e_disc_gen flame\n")
+            outfile.write("\n// end brokat_gen flame\n")
 
         with open(f"scriptTemplates/galaxies_gen.txt", 'r') as infile:
             content = infile.read()
@@ -344,7 +348,7 @@ def generate_script(song_data):
 # 
 # #af = dict.fromkeys(test[1::])
 # #print(af)
-end_time = 0
+#end_time = 0
 # test_af = {}
 # row = audio_features_df.iloc[0]
 # #print(len(audio_features_df))
@@ -365,58 +369,128 @@ end_time = 0
 
 # feature extraction
 
-y, sr = librosa.load("Data/audio_files/genre_set/classical.00000.wav", sr=22050)
-y = librosa.resample(y=y, orig_sr=sr, target_sr=44100)
-audio_features = extract_features(y, 44100, 0.5).to_numpy()
-genre_features = extract_features(y, 44100, len(y)//44100).to_numpy()[:,1:]
-bpm_value = extract_bpm(y, 44100)
-print(bpm_value)
+def load_data(audio_file_path, sample_rate, output_script_name):
+    y, sr = librosa.load(audio_file_path, sr=sample_rate)
+    y = librosa.resample(y=y, orig_sr=sr, target_sr=44100)
+    audio_features = extract_features(y, 44100, 0.5).to_numpy()
+    genre_features = extract_features(y, 44100, len(y)//44100).to_numpy()[:,1:]
+    bpm_value = extract_bpm(y, 44100)
+#print(bpm_value)
 #print(audio_features)
 #print(genre_features)
 # still need bpm
 
 # detect genre and emotion
-valence_model = joblib.load('trained_models/valence_rf_model.pkl')
-arousal_model = joblib.load('trained_models/arousal_rf_model.pkl')
-genre_model = joblib.load('trained_models/genre_rf_model.pkl')
+    valence_model = joblib.load('trained_models/valence_rf_model.pkl')
+    arousal_model = joblib.load('trained_models/arousal_rf_model.pkl')
+    genre_model = joblib.load('trained_models/genre_rf_model.pkl')
 
-valence_values = valence_model.predict(audio_features[:,1:])
+    valence_values = valence_model.predict(audio_features[:,1:])
 #print(valence_value)
-arousal_values = arousal_model.predict(audio_features[:,1:])
-genre_value = genre_model.predict(genre_features)
+    arousal_values = arousal_model.predict(audio_features[:,1:])
+    genre_value = genre_model.predict(genre_features)
 # values, counts = np.unique(genre_values, return_counts=True)
 # max_count_index = np.argmax(counts)
 #print(genre_values)
 # print(values[max_count_index])
 # build script
 #print(audio_features)
-song_data = {
-    "genre": genre_value[0],
-    "audio_frames":{},
-    "bpm": bpm_value[0]/120
-}
-
-print(audio_features[0][28])
-end_time = 0
-for i in range(len(audio_features)):
-    song_data["audio_frames"][audio_features[i][0]] = {
-        "valence": valence_values[i],
-        "arousal": arousal_values[i],
-        "rms_mean": audio_features[i][27],
-        "rms_std": audio_features[i][28]
+    song_data = {
+        "genre": genre_value[0],
+        "audio_frames":{},
+        "bpm": bpm_value[0]/120
     }
-    if i == len(audio_features)-1:
-        end_time = audio_features[i][0] + 0.5
 
-song_data["song_length"] = end_time
-print(end_time)
+#print(audio_features[0][28])
+    end_time = 0
+    for i in range(len(audio_features)):
+        song_data["audio_frames"][audio_features[i][0]] = {
+            "valence": valence_values[i],
+            "arousal": arousal_values[i],
+            "rms_mean": audio_features[i][27],
+            "rms_std": audio_features[i][28]
+        }
+        if i == len(audio_features)-1:
+            end_time = audio_features[i][0] + 0.5
+
+    song_data["song_length"] = end_time
+#print(end_time)
 # GET BPM
-print(song_data)
-generate_script(song_data)
+#print(song_data)
+    generate_script(song_data, output_script_name)
+# 
+y, sr = librosa.load("Data/audio_files/genre_set/rock.00000.wav", sr=22050)
+y = librosa.resample(y=y, orig_sr=sr, target_sr=44100)
+audio_features = extract_features(y, 44100, 0.5).to_numpy()
+genre_features = extract_features(y, 44100, len(y)//44100).to_numpy()[:,1:]
+bpm_value = extract_bpm(y, 44100)
+# #print(bpm_value)
+# #print(audio_features)
+# #print(genre_features)
+# # still need bpm
+# 
+# # detect genre and emotion
+valence_model = joblib.load('trained_models/valence_rf_model.pkl')
+arousal_model = joblib.load('trained_models/arousal_rf_model.pkl')
+# genre_model = joblib.load('trained_models/genre_rf_model.pkl')
+# 
+valence_values = valence_model.predict(audio_features[:,1:])
+# #print(valence_value)
+arousal_values = arousal_model.predict(audio_features[:,1:])
+v = np.mean(valence_values)
+a = np.mean(arousal_values)
+# print(v)
+# print(a)
+print(v*3)
+print(a*-2)
+color1 = get_color(v,a)
+print(color1)
+angle = math.degrees(math.atan2(a, v))
+color2 = get_color(math.cos(angle)*85/255, math.sin(angle)*85/255)
+color3 = get_color(math.cos(angle), math.sin(angle))
+print(color2)
+print(color3)
+# genre_value = genre_model.predict(genre_features)
+# # values, counts = np.unique(genre_values, return_counts=True)
+# # max_count_index = np.argmax(counts)
+# #print(genre_values)
+# # print(values[max_count_index])
+# # build script
+# #print(audio_features)
+# song_data = {
+#     "genre": genre_value[0],
+#     "audio_frames":{},
+#     "bpm": bpm_value[0]/120
+# }
+# 
+# #print(audio_features[0][28])
+# end_time = 0
+# for i in range(len(audio_features)):
+#     song_data["audio_frames"][audio_features[i][0]] = {
+#         "valence": valence_values[i],
+#         "arousal": arousal_values[i],
+#         "rms_mean": audio_features[i][27],
+#         "rms_std": audio_features[i][28]
+#     }
+#     if i == len(audio_features)-1:
+#         end_time = audio_features[i][0] + 0.5
+# 
+# song_data["song_length"] = end_time
+# #print(end_time)
+# # GET BPM
+# #print(song_data)
+# generate_script(song_data)
 #angles = np.degrees(np.arctan2(test_a[0::], test_v[0::])) % 360
 
 #angle = math.degrees(math.atan2(test_a[0], test_v[0]))
 
 
 #generate_script(test_af)
+#print(get_color(-0.27, -0.068))
 
+# load_data("Data/audio_files/genre_set/hiphop.00000.wav", 22050, "hiphop_sample")
+# load_data("Data/audio_files/genre_set/jazz.00000.wav", 22050, "jazz_sample")
+# load_data("Data/audio_files/genre_set/metal.00000.wav", 22050, "metal_sample")
+# load_data("Data/audio_files/genre_set/pop.00001.wav", 22050, "pop_sample")
+# load_data("Data/audio_files/genre_set/reggae.00000.wav", 22050, "reggae_sample")
+# load_data("Data/audio_files/genre_set/rock.00000.wav", 22050, "rock_sample")

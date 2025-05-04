@@ -1,3 +1,7 @@
 /Data
 /images
 /trained_models
+/old
+/final_videos
+*.mp4
+/scripts

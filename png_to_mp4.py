@@ -2,11 +2,31 @@ import moviepy
 import glob
 
 
-image_files = sorted(glob.glob("images/song_2/my_gen/*.png"))
+def render_video(song, audio_file):
+    image_files = sorted(glob.glob(f"images/{song}/my_gen/*.png"))
+    video = moviepy.ImageSequenceClip(image_files, fps=24)  
+    audio = moviepy.AudioFileClip(audio_file)
+    video_with_audio = video.with_audio(audio)
+    video_with_audio.write_videofile(f"videos/{song}/{song}_my_gen.mp4", codec="libx264", audio_codec="aac")
+    
+    image_files = sorted(glob.glob(f"images/{song}/paper_gen/*.png"))
+    video = moviepy.ImageSequenceClip(image_files, fps=24)  
+    #audio = moviepy.AudioFileClip(audio_file)
+    video_with_audio = video.with_audio(audio)
+    video_with_audio.write_videofile(f"videos/{song}/{song}_paper_gen.mp4", codec="libx264", audio_codec="aac")
+    
+    image_files = sorted(glob.glob(f"images/{song}/random_gen/*.png"))
+    video = moviepy.ImageSequenceClip(image_files, fps=24)  
+    #audio = moviepy.AudioFileClip(audio_file)
+    video_with_audio = video.with_audio(audio)
+    video_with_audio.write_videofile(f"videos/{song}/{song}_random_gen.mp4", codec="libx264", audio_codec="aac")
 
-# Create a clip from the images
-video = moviepy.ImageSequenceClip(image_files, fps=24)  # You can set fps (frames per second)
-audio = moviepy.AudioFileClip("Data/audio_files/genre_set/classical.00000.wav")
-video_with_audio = video.with_audio(audio)
-# Write the video file
-video_with_audio.write_videofile("final_video_my.mp4", codec="libx264", audio_codec="aac")
+    image_files = sorted(glob.glob(f"images/{song}/random_2_gen/*.png"))
+    video = moviepy.ImageSequenceClip(image_files, fps=24)  
+    #audio = moviepy.AudioFileClip(audio_file)
+    video_with_audio = video.with_audio(audio)
+    video_with_audio.write_videofile(f"videos/{song}/{song}_random_2_gen.mp4", codec="libx264", audio_codec="aac")
+        
+        
+#"Data/audio_files/genre_set/classical.00000.wav"
+render_video(song="song_10", audio_file="Data/audio_files/genre_set/rock.00000.wav")

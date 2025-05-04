@@ -26,7 +26,7 @@ import org.jwildfire.create.tina.animate.*;
 import org.jwildfire.base.Prefs;
 import org.jwildfire.create.tina.dance.model.FlamePropertyPath;
 import org.jwildfire.create.tina.audio.JLayerInterface;
-//import org.jwildfire.create.tina.randomflame.ExperimentalSimpleRandomFlameGenerator;
+import org.jwildfire.create.tina.randomflame.ExperimentalSimpleRandomFlameGenerator;
 public void run(ScriptRunnerEnvironment pEnv) throws Exception {
     JLayerInterface player = new JLayerInterface();
     DancingFlameProject danceProject = new DancingFlameProject();

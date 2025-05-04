@@ -9,19 +9,14 @@
   else {
     //pEnv.setCurrFlame(flame);
   }
-  //Flame[] flames = new Flame[danceProject.getFlames().size()];
-  //danceProject.getFlames().toArray(flames);
-  //danceProject.setSoundFilename(player, "2.mp3");
-  //DefaultMotionCreator creator = new DefaultMotionCreator();
-  //creator.createMotions(danceProject);
-  //danceProject.getMotions().add(SetSawToothMotion(flames));
-  //danceProject.getMotions().add(SetFFTMotions(flames, "layer1.density", 1, 0, 0));
-  //danceWriter.writeProject(danceProject, "tDance.jwfdance");
-  //FlameMovie flameMovie = new FlameMovie(Prefs.getPrefs());
-  //flameMovie.getGlobalScripts()[0] = new GlobalScript(GlobalScriptType.ROTATE_ROLL, 1);
-  flameMovie.getxFormScripts()[0] = new XFormScript(XFormScriptType.ROTATE_FINAL_XFORM, 1);
-  flameMovie.getxFormScripts()[1] = new XFormScript(XFormScriptType.ROTATE_POST_FINAL_XFORM, 1);
-  flameMovie.getxFormScripts()[2] = new XFormScript(XFormScriptType.ROTATE_FULL, 1);
+  flameMovie.getxFormScripts()[0] = new XFormScript(XFormScriptType.ROTATE_FULL, 1); //1,2,3,4,5
+  flameMovie.getxFormScripts()[1] = new XFormScript(XFormScriptType.ROTATE_FINAL_XFORM, 1); //6,7,8,9
+  flameMovie.getxFormScripts()[2] = new XFormScript(XFormScriptType.ROTATE_FIRST_XFORM, 1); //10,11,12,13,14,15,16,17,18,19
+  flameMovie.getxFormScripts()[3] = new XFormScript(XFormScriptType.ROTATE_2ND_XFORM, 1); //20,21,22,23,24,25,26,27,28,29
+  flameMovie.getxFormScripts()[4] = new XFormScript(XFormScriptType.ROTATE_3RD_XFORM, 1); //30,31,32,33,34,35,36,37,38,39
+  flameMovie.getxFormScripts()[5] = new XFormScript(XFormScriptType.ROTATE_4TH_XFORM, 1); //40,41,42,43,44,45,46,47,48,49
+  flameMovie.getxFormScripts()[6] = new XFormScript(XFormScriptType.ROTATE_5TH_XFORM, 1); //50,51,52,53,54,55,56,57,58,59
+  flameMovie.getxFormScripts()[7] = new XFormScript(XFormScriptType.ROTATE_LAST_XFORM, 1); //60,61,62,63,64
   FlameMovieWriter flameMovieWriter = new FlameMovieWriter();
-  flameMovieWriter.writeFlame(flameMovie, "test.jwfrender");
+  flameMovieWriter.writeFlame(flameMovie, "sample.jwfrender");
 }
