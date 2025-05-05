@@ -5,6 +5,7 @@ import pandas as pd
 import librosa
 import joblib
 from sklearn.utils import column_or_1d
+import matplotlib.image as mpimg
 
 from features_extraction import extract_features, extract_bpm
 
@@ -85,12 +86,58 @@ def get_categories(angles):
     return categories
 
 def get_color(x, y):
-    img = Image.open("tt.png") #tt
-    width, height = img.size
+    img = mpimg.imread('tt.png')
+    img_height, img_width, _ = img.shape
 
-    pixel_x = int((x + 1) / 2 * width)
-    pixel_y = int((1 - (y + 1) / 2) * height)
-    return img.getpixel((pixel_x, pixel_y))
+# Calculate the center of the image
+    center_x = img_width / 2
+    center_y = img_height / 2
+    print(center_x)
+    print(center_y)
+
+# Define the translated coordinate mappings
+    translated_coords = [
+        (center_x - 450, center_y - 450),
+        (center_x + 450, center_y - 450),
+        (center_x - 450, center_y + 450),
+        (center_x + 450, center_y + 450)
+    ]
+    angle = math.atan2(x, y)
+    print(angle)
+#angle2 = math.atan( 0.03808333333/0.08258666666)
+#print(angle2) 
+#color3 = get_color(math.cos(angle), math.sin(angle))
+# 2. Example Original Data Points
+    x_original = [math.cos(angle)]
+    y_original = [math.sin(angle)]
+
+    def translate_coordinate_centered(x_orig, y_orig):
+        scale_x = translated_coords[1][0] - translated_coords[0][0]
+        scale_y = translated_coords[2][1] - translated_coords[0][1]
+        x_translated = center_x + x_orig * (scale_x / 2)
+        y_translated = center_y - y_orig * (scale_y / 2)
+        return int(round(x_translated)), int(round(y_translated))
+
+    rgb_values_0_255 = []
+    for x_orig, y_orig in zip(x_original, y_original):
+        x_pixel, y_pixel = translate_coordinate_centered(x_orig, y_orig)
+
+        if 0 <= y_pixel < img_height and 0 <= x_pixel < img_width:
+            rgb = img[y_pixel, x_pixel]
+            # Scale the RGB values from 0-1 to 0-255
+            rgb_255 = (rgb * 255).astype(int)
+            rgb_values_0_255.append(rgb_255)
+            print(f"Original: ({x_orig:.3f}, {y_orig:.3f}), Pixel: ({x_pixel}, {y_pixel}), RGB (0-255): {rgb_255}")
+        else:
+            rgb_values_0_255.append(None)
+            print(f"Original: ({x_orig:.3f}, {y_orig:.3f}), Pixel: ({x_pixel}, {y_pixel}), Out of bounds")
+    return rgb_values_0_255[0]
+    #img = Image.open("tt.png") #tt
+    #width, height = img.size
+
+    #pixel_x = int((x + 1) / 2 * width)
+    #pixel_y = int((1 - (y + 1) / 2) * height)
+    #return img.getpixel((pixel_x, pixel_y))
 
 def get_colors(xs, ys):
     colors = []
@@ -109,11 +156,12 @@ def generate_script(song_data, output_script_name):
     audio_frames = song_data["audio_frames"]
     #print(audio_frames)
     for audio_frame in audio_frames:
-        angle = math.degrees(math.atan2(audio_frames[audio_frame]["arousal"], audio_frames[audio_frame]["valence"]))
+        angle = math.atan2(audio_frames[audio_frame]["arousal"], audio_frames[audio_frame]["valence"])
         audio_frames[audio_frame]["startTime"] = audio_frame
-        audio_frames[audio_frame]["category"] = get_category(angle)
+        audio_frames[audio_frame]["category"] = get_category(math.degrees(angle))
         audio_frames[audio_frame]["color_start"] = get_genre_color(song_data["genre"])
         audio_frames[audio_frame]["color_end"] = get_color(audio_frames[audio_frame]["valence"], audio_frames[audio_frame]["arousal"])
+        #audio_frames[audio_frame]["color_end"] = get_color(math.cos(angle), math.sin(angle))
         #print(energy_mean)
         if reset_frame_counter > 10:
             #generate new video frame
@@ -389,6 +437,7 @@ def load_data(audio_file_path, sample_rate, output_script_name):
 #print(valence_value)
     arousal_values = arousal_model.predict(audio_features[:,1:])
     genre_value = genre_model.predict(genre_features)
+    print(genre_value)
 # values, counts = np.unique(genre_values, return_counts=True)
 # max_count_index = np.argmax(counts)
 #print(genre_values)
@@ -421,35 +470,35 @@ def load_data(audio_file_path, sample_rate, output_script_name):
 # 
 y, sr = librosa.load("Data/audio_files/genre_set/rock.00000.wav", sr=22050)
 y = librosa.resample(y=y, orig_sr=sr, target_sr=44100)
-audio_features = extract_features(y, 44100, 0.5).to_numpy()
-genre_features = extract_features(y, 44100, len(y)//44100).to_numpy()[:,1:]
-bpm_value = extract_bpm(y, 44100)
+#audio_features = extract_features(y, 44100, 0.5).to_numpy()
+#genre_features = extract_features(y, 44100, len(y)//44100).to_numpy()[:,1:]
+#bpm_value = extract_bpm(y, 44100)
 # #print(bpm_value)
 # #print(audio_features)
 # #print(genre_features)
 # # still need bpm
 # 
 # # detect genre and emotion
-valence_model = joblib.load('trained_models/valence_rf_model.pkl')
-arousal_model = joblib.load('trained_models/arousal_rf_model.pkl')
+#valence_model = joblib.load('trained_models/valence_rf_model.pkl')
+#arousal_model = joblib.load('trained_models/arousal_rf_model.pkl')
 # genre_model = joblib.load('trained_models/genre_rf_model.pkl')
 # 
-valence_values = valence_model.predict(audio_features[:,1:])
+#valence_values = valence_model.predict(audio_features[:,1:])
 # #print(valence_value)
-arousal_values = arousal_model.predict(audio_features[:,1:])
-v = np.mean(valence_values)
-a = np.mean(arousal_values)
+#arousal_values = arousal_model.predict(audio_features[:,1:])
+#v = np.mean(valence_values)
+#a = np.mean(arousal_values)
 # print(v)
 # print(a)
-print(v*3)
-print(a*-2)
-color1 = get_color(v,a)
-print(color1)
-angle = math.degrees(math.atan2(a, v))
-color2 = get_color(math.cos(angle)*85/255, math.sin(angle)*85/255)
-color3 = get_color(math.cos(angle), math.sin(angle))
-print(color2)
-print(color3)
+#print(v*3)
+#print(a*-2)
+#color1 = get_color(v,a)
+#print(color1)
+#angle = math.degrees(math.atan2(a, v))
+#color2 = get_color(math.cos(angle)*85/255, math.sin(angle)*85/255)
+#color3 = get_color(math.cos(angle), math.sin(angle))
+#print(color2)
+#print(color3)
 # genre_value = genre_model.predict(genre_features)
 # # values, counts = np.unique(genre_values, return_counts=True)
 # # max_count_index = np.argmax(counts)
@@ -488,9 +537,18 @@ print(color3)
 #generate_script(test_af)
 #print(get_color(-0.27, -0.068))
 
-# load_data("Data/audio_files/genre_set/hiphop.00000.wav", 22050, "hiphop_sample")
+#load_data("Data/audio_files/genre_set/hiphop.00000.wav", 22050, "hiphop_sample")
 # load_data("Data/audio_files/genre_set/jazz.00000.wav", 22050, "jazz_sample")
-# load_data("Data/audio_files/genre_set/metal.00000.wav", 22050, "metal_sample")
+#load_data("Data/audio_files/genre_set/metal.00001.wav", 22050, "metal_sample")
 # load_data("Data/audio_files/genre_set/pop.00001.wav", 22050, "pop_sample")
-# load_data("Data/audio_files/genre_set/reggae.00000.wav", 22050, "reggae_sample")
-# load_data("Data/audio_files/genre_set/rock.00000.wav", 22050, "rock_sample")
+load_data("output_30sec.mp3", 44100, "classical_sample")
+#load_data("Data/audio_files/genre_set/rock.00004.wav", 22050, "rock_sample")
+
+#1,2,3,4
+#5,6,7,8,9
+#10,11,12,13,14,15,16,17,18,19
+#20,21,22,23,24,25,26,27,28,29
+#30,31,32,33,34,35,36,37,38,39
+#40,41,42,43,44,45,46,47,48,49
+#50,51,52,53,54,55,56,57,58,59
+#60,61,62,63,64

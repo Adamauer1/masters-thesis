@@ -30,3 +30,4 @@ def render_video(song, audio_file):
         
 #"Data/audio_files/genre_set/classical.00000.wav"
 render_video(song="song_10", audio_file="Data/audio_files/genre_set/rock.00000.wav")
+

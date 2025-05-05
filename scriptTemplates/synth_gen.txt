@@ -145,7 +145,7 @@ public Flame SynthGen(int frameNumber, double valence, double arousal, int redSt
       XForm xForm = xForm1.makeCopy();
       layer.getXForms().add(xForm);
       xForm.setWeight(1.0);
-      xForm.setColor(centre_color);
+      xForm.setColor(centre_color + Math.random()*0.5);
       //xForm.setColorType(ColorType.TARGET);
       //xForm.setTargetColor(196,157, 228);
       xForm.setColorSymmetry(centre_symmetry);

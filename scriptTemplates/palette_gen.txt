@@ -3,12 +3,12 @@ public RGBPalette PaletteGen(int redStart, int greenStart, int blueStart, int re
     RGBColor endColor = new RGBColor(redEnd,greenEnd,blueEnd);
     RGBPalette palette = new RGBPalette();
     for (int i = 0; i < RGBPalette.PALETTE_SIZE; i++) {
-      float t = (float)i / (RGBPalette.PALETTE_SIZE - 1);
-
+      //float t = (float)i / (RGBPalette.PALETTE_SIZE - 1);
+      double biasStrength = 4.0;
       // Optionally add randomness to interpolation
       float jitter = 0.1f * (float)Math.random();
-      t = Math.min(1.0f, Math.max(0.0f, t + (Math.random() < 0.5 ? -jitter : jitter)));
-
+      //t = Math.min(1.0f, Math.max(0.0f, t + (Math.random() < 0.5 ? -jitter : jitter)));
+      double t = Math.pow((double)i / (RGBPalette.PALETTE_SIZE - 1), biasStrength);
       int r = (int)(startColor.getRed()   + t * (endColor.getRed()   - startColor.getRed()));
       int g = (int)(startColor.getGreen() + t * (endColor.getGreen() - startColor.getGreen()));
       int b = (int)(startColor.getBlue()  + t * (endColor.getBlue()  - startColor.getBlue()));
