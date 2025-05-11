@@ -92,8 +92,8 @@ def get_color(x, y):
 # Calculate the center of the image
     center_x = img_width / 2
     center_y = img_height / 2
-    print(center_x)
-    print(center_y)
+    #print(center_x)
+    #print(center_y)
 
 # Define the translated coordinate mappings
     translated_coords = [
@@ -103,7 +103,7 @@ def get_color(x, y):
         (center_x + 450, center_y + 450)
     ]
     angle = math.atan2(x, y)
-    print(angle)
+    #print(angle)
 #angle2 = math.atan( 0.03808333333/0.08258666666)
 #print(angle2) 
 #color3 = get_color(math.cos(angle), math.sin(angle))
@@ -127,10 +127,10 @@ def get_color(x, y):
             # Scale the RGB values from 0-1 to 0-255
             rgb_255 = (rgb * 255).astype(int)
             rgb_values_0_255.append(rgb_255)
-            print(f"Original: ({x_orig:.3f}, {y_orig:.3f}), Pixel: ({x_pixel}, {y_pixel}), RGB (0-255): {rgb_255}")
+            #print(f"Original: ({x_orig:.3f}, {y_orig:.3f}), Pixel: ({x_pixel}, {y_pixel}), RGB (0-255): {rgb_255}")
         else:
             rgb_values_0_255.append(None)
-            print(f"Original: ({x_orig:.3f}, {y_orig:.3f}), Pixel: ({x_pixel}, {y_pixel}), Out of bounds")
+            #print(f"Original: ({x_orig:.3f}, {y_orig:.3f}), Pixel: ({x_pixel}, {y_pixel}), Out of bounds")
     return rgb_values_0_255[0]
     #img = Image.open("tt.png") #tt
     #width, height = img.size
@@ -171,8 +171,8 @@ def generate_script(song_data, output_script_name):
             if frame_index != 0:
                 video_frames[frame_index-1]["endTime"] = video_frames[frame_index]["startTime"]
             temp_energy = audio_frames[audio_frame]["rms_mean"]
-            #if energy_mean != 0:
-                #video_frames[frame_index]["rms_mean"] = energy_mean
+            if energy_mean != 0:
+                video_frames[frame_index]["rms_mean"] = energy_mean
             energy_mean = temp_energy
             frame_index += 1
             reset_frame_counter = 0
@@ -183,33 +183,33 @@ def generate_script(song_data, output_script_name):
             if frame_index != 0:
                 video_frames[frame_index-1]["endTime"] = video_frames[frame_index]["startTime"]
             temp_energy = audio_frames[audio_frame]["rms_mean"]
-            #if energy_mean != 0:
-                #video_frames[frame_index]["rms_mean"] = energy_mean
+            if energy_mean != 0:
+                video_frames[frame_index]["rms_mean"] = energy_mean
             energy_mean = temp_energy
             frame_index += 1
             print("change video frame due to category change")
             reset_frame_counter = 0
         
-        # elif math.fabs(energy_mean - audio_frames[audio_frame]["rms_mean"]) > audio_frames[audio_frame]["rms_std"]:
-        #     #generate new video frame
-        #     last_category = audio_frames[audio_frame]["category"]
-        #     video_frames[frame_index] = audio_frames[audio_frame]
-        #     if frame_index != 0:
-        #         video_frames[frame_index-1]["endTime"] = video_frames[frame_index]["startTime"]
-        #     temp_energy = audio_frames[audio_frame]["rms_mean"]
-        #     if energy_mean != 0:
-        #         video_frames[frame_index]["rms_mean"] = energy_mean
-        #     energy_mean = temp_energy
-        #     frame_index += 1
-        #     print("change video frame due to large change in energy")
-        #     reset_frame_counter = 0
+        elif math.fabs(energy_mean - audio_frames[audio_frame]["rms_mean"]) > audio_frames[audio_frame]["rms_std"]*2:
+            #generate new video frame
+            last_category = audio_frames[audio_frame]["category"]
+            video_frames[frame_index] = audio_frames[audio_frame]
+            if frame_index != 0:
+                video_frames[frame_index-1]["endTime"] = video_frames[frame_index]["startTime"]
+            temp_energy = audio_frames[audio_frame]["rms_mean"]
+            if energy_mean != 0:
+                video_frames[frame_index]["rms_mean"] = energy_mean
+            energy_mean = temp_energy
+            frame_index += 1
+            print("change video frame due to large change in energy")
+            reset_frame_counter = 0
         else:
             # keep current video frame and update mean and std value
             if reset_frame_counter != 0:
                 energy_mean = energy_mean * (reset_frame_counter-1)/reset_frame_counter + audio_frames[audio_frame]["rms_mean"] / reset_frame_counter
             else:
                 energy_mean = audio_frames[audio_frame]["rms_mean"]
-            #energy_std = (energy_std + audio_frames[audio_frame]["pcm_RMSenergy_sma_stddev"])/2
+            #energy_std = (energy_std + audio_frames[audio_frame]["rms_std"])/2
 
         reset_frame_counter += 1
     #print(video_frames)
@@ -267,7 +267,7 @@ def generate_script(song_data, output_script_name):
             #outfile.write("\n")
             #outfile.write(f'{audio_frames[audio_frame]["category"]}({idx},{audio_frames[audio_frame]["valence"] * 3}, {audio_frames[audio_frame]["arousal"] * -2}, {audio_frames[audio_frame]["color_start"][0]}, {audio_frames[audio_frame]["color_start"][1]}, {audio_frames[audio_frame]["color_start"][2]}, {audio_frames[audio_frame]["color_end"][0]}, {audio_frames[audio_frame]["color_end"][1]}, {audio_frames[audio_frame]["color_end"][2]}, {audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]});')
             #print(video_frames["color_start"])
-            outfile.write(f'AddFlameMoviePart(flameMovie, {video_frames[video_frame]["category"]}({idx},{video_frames[video_frame]["valence"] * 3}, {video_frames[video_frame]["arousal"] * -2}, {video_frames[video_frame]["color_start"][0]}, {video_frames[video_frame]["color_start"][1]}, {video_frames[video_frame]["color_start"][2]}, {video_frames[video_frame]["color_end"][0]}, {video_frames[video_frame]["color_end"][1]}, {video_frames[video_frame]["color_end"][2]}, {video_frames[video_frame]["rms_mean"]}), {int(video_frames[video_frame]["frame_count"])});')
+            outfile.write(f'AddFlameMoviePart(flameMovie, {video_frames[video_frame]["category"]}({idx},{video_frames[video_frame]["valence"] * 3}, {video_frames[video_frame]["arousal"] * -2}, {video_frames[video_frame]["color_start"][0]}, {video_frames[video_frame]["color_start"][1]}, {video_frames[video_frame]["color_start"][2]}, {video_frames[video_frame]["color_end"][0]}, {video_frames[video_frame]["color_end"][1]}, {video_frames[video_frame]["color_end"][2]}, {video_frames[video_frame]["rms_mean"]*10}), {int(video_frames[video_frame]["frame_count"])});')
             outfile.write("\n")
         outfile.write(f'flameMovie.getGlobalScripts()[0] = new GlobalScript(GlobalScriptType.ROTATE_ROLL, {song_data["bpm"]});')
         with open(footer_file, 'r') as infile:
@@ -417,12 +417,13 @@ def generate_script(song_data, output_script_name):
 
 # feature extraction
 
-def load_data(audio_file_path, sample_rate, output_script_name):
+def load_data(audio_file_path, sample_rate, output_script_name, guess_bpm):
     y, sr = librosa.load(audio_file_path, sr=sample_rate)
     y = librosa.resample(y=y, orig_sr=sr, target_sr=44100)
     audio_features = extract_features(y, 44100, 0.5).to_numpy()
     genre_features = extract_features(y, 44100, len(y)//44100).to_numpy()[:,1:]
-    bpm_value = extract_bpm(y, 44100)
+    bpm_value = extract_bpm(y, 44100, guess_bpm)
+    print(bpm_value)
 #print(bpm_value)
 #print(audio_features)
 #print(genre_features)
@@ -437,6 +438,7 @@ def load_data(audio_file_path, sample_rate, output_script_name):
 #print(valence_value)
     arousal_values = arousal_model.predict(audio_features[:,1:])
     genre_value = genre_model.predict(genre_features)
+    genre_value = ["rock"]
     print(genre_value)
 # values, counts = np.unique(genre_values, return_counts=True)
 # max_count_index = np.argmax(counts)
@@ -468,9 +470,9 @@ def load_data(audio_file_path, sample_rate, output_script_name):
 #print(song_data)
     generate_script(song_data, output_script_name)
 # 
-y, sr = librosa.load("Data/audio_files/genre_set/rock.00000.wav", sr=22050)
-y = librosa.resample(y=y, orig_sr=sr, target_sr=44100)
-#audio_features = extract_features(y, 44100, 0.5).to_numpy()
+y, sr = librosa.load("audio/rock_30_secs.mp3", sr=44100)
+#y = librosa.resample(y=y, orig_sr=sr, target_sr=44100)
+audio_features = extract_features(y, 44100, 0.5).to_numpy()
 #genre_features = extract_features(y, 44100, len(y)//44100).to_numpy()[:,1:]
 #bpm_value = extract_bpm(y, 44100)
 # #print(bpm_value)
@@ -479,26 +481,33 @@ y = librosa.resample(y=y, orig_sr=sr, target_sr=44100)
 # # still need bpm
 # 
 # # detect genre and emotion
-#valence_model = joblib.load('trained_models/valence_rf_model.pkl')
-#arousal_model = joblib.load('trained_models/arousal_rf_model.pkl')
+valence_model = joblib.load('trained_models/valence_rf_model.pkl')
+arousal_model = joblib.load('trained_models/arousal_rf_model.pkl')
 # genre_model = joblib.load('trained_models/genre_rf_model.pkl')
 # 
-#valence_values = valence_model.predict(audio_features[:,1:])
+valence_values = valence_model.predict(audio_features[:,1:])
 # #print(valence_value)
-#arousal_values = arousal_model.predict(audio_features[:,1:])
-#v = np.mean(valence_values)
-#a = np.mean(arousal_values)
+arousal_values = arousal_model.predict(audio_features[:,1:])
+v = np.mean(valence_values)
+a = np.mean(arousal_values)
 # print(v)
 # print(a)
-#print(v*3)
-#print(a*-2)
-#color1 = get_color(v,a)
-#print(color1)
-#angle = math.degrees(math.atan2(a, v))
-#color2 = get_color(math.cos(angle)*85/255, math.sin(angle)*85/255)
-#color3 = get_color(math.cos(angle), math.sin(angle))
-#print(color2)
-#print(color3)
+print(v*3)
+print(a*-2)
+def get_paper_color(x,y):
+    img = Image.open("tt.png") #tt
+    width, height = img.size
+
+    pixel_x = int((x + 1) / 2 * width)
+    pixel_y = int((1 - (y + 1) / 2) * height)
+    return img.getpixel((pixel_x, pixel_y))
+color1 = get_paper_color(v,a)
+print(color1)
+angle = math.atan2(a, v)
+color2 = get_paper_color(math.cos(angle)*85/255, math.sin(angle)*85/255)
+color3 = get_paper_color(math.cos(angle), math.sin(angle))
+print(color2)
+print(color3)
 # genre_value = genre_model.predict(genre_features)
 # # values, counts = np.unique(genre_values, return_counts=True)
 # # max_count_index = np.argmax(counts)
@@ -537,11 +546,11 @@ y = librosa.resample(y=y, orig_sr=sr, target_sr=44100)
 #generate_script(test_af)
 #print(get_color(-0.27, -0.068))
 
-#load_data("Data/audio_files/genre_set/hiphop.00000.wav", 22050, "hiphop_sample")
-# load_data("Data/audio_files/genre_set/jazz.00000.wav", 22050, "jazz_sample")
+#load_data("audio/rock_30_secs.mp3", 44100, "rock_sample", 120)
+#load_data("Data/audio_files/genre_set/jazz.00000.wav", 22050, "jazz_sample")
 #load_data("Data/audio_files/genre_set/metal.00001.wav", 22050, "metal_sample")
-# load_data("Data/audio_files/genre_set/pop.00001.wav", 22050, "pop_sample")
-load_data("output_30sec.mp3", 44100, "classical_sample")
+#load_data("Data/audio_files/genre_set/pop.00001.wav", 22050, "pop_sample")
+#load_data("output_30sec.mp3", 44100, "classical_sample")
 #load_data("Data/audio_files/genre_set/rock.00004.wav", 22050, "rock_sample")
 
 #1,2,3,4

@@ -4,7 +4,7 @@ public RGBPalette PaletteGen(int redStart, int greenStart, int blueStart, int re
     RGBPalette palette = new RGBPalette();
     for (int i = 0; i < RGBPalette.PALETTE_SIZE; i++) {
       //float t = (float)i / (RGBPalette.PALETTE_SIZE - 1);
-      double biasStrength = 4.0;
+      double biasStrength = 2.0;
       // Optionally add randomness to interpolation
       float jitter = 0.1f * (float)Math.random();
       //t = Math.min(1.0f, Math.max(0.0f, t + (Math.random() < 0.5 ? -jitter : jitter)));

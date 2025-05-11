@@ -18,8 +18,9 @@ public Flame JulianGen(int frameNumber, double valence, double arousal, int redS
     {
       XForm xForm = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(0.00001 + Math.random() * 20.0);
+      xForm.setWeight(0.00001 + Math.random() * 20.0 * rmsEnergy);
       xForm.setColor(Math.random());
+      xForm.setColorSymmetry(-0.5);
       //xForm.setColorType(ColorType.TARGET);
       //xForm.setTargetColor(196,157, 228);
       XFormTransformService.localTranslate(xForm, valence, arousal, false);
@@ -37,8 +38,9 @@ public Flame JulianGen(int frameNumber, double valence, double arousal, int redS
     {
       XForm xForm = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(0.00001 + Math.random() * 6.0);
+      xForm.setWeight(0.00001 + Math.random() * 6.0 * rmsEnergy);
       xForm.setColor(Math.random());
+      xForm.setColorSymmetry(-0.5);
       //xForm.setColorType(ColorType.TARGET);
       //xForm.setTargetColor(202,166, 225);
       XFormTransformService.localTranslate(xForm, valence, arousal, false);
@@ -60,8 +62,9 @@ public Flame JulianGen(int frameNumber, double valence, double arousal, int redS
     {
       XForm xForm = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(0.00001 + Math.random() * 2.0);
+      xForm.setWeight(0.00001 + Math.random() * 2.0 * rmsEnergy);
       xForm.setColor(Math.random());
+      xForm.setColorSymmetry(-0.5);
       //xForm.setColorType(ColorType.TARGET);
       //xForm.setTargetColor(133,85, 234);
       XFormTransformService.localTranslate(xForm, valence, arousal, false);

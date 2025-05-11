@@ -15,7 +15,7 @@ public Flame BrokatGen(int frameNumber, double valence, double arousal, int redS
     {
       XForm xForm = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(1.5 + Math.random() * 1.0);
+      xForm.setWeight(1.5 + Math.random() * 1.0* rmsEnergy);
       VariationFunc varFunc = VariationFuncList.getVariationFuncInstance("curl", true);
       varFunc.setParameter("c1", -1.0);
       varFunc.setParameter("c2", 0.001 + Math.random() * 0.0199);
@@ -37,7 +37,7 @@ public Flame BrokatGen(int frameNumber, double valence, double arousal, int redS
     {
       XForm xForm = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(0.05 + Math.random() * 0.35);
+      xForm.setWeight(0.05 + Math.random() * 0.35 * rmsEnergy);
       String fncNames[] = { "juliascope", "julia3D", "julia3Dz", "julian" };
       VariationFunc varFunc = VariationFuncList.getVariationFuncInstance(fncNames[Tools.randomInt(fncNames.length)], true);
       varFunc.setParameter("power", Math.random() < 0.33 ? 2 : Math.random() < 0.5 ? 3 : 4);
@@ -56,7 +56,7 @@ public Flame BrokatGen(int frameNumber, double valence, double arousal, int redS
     {
       XForm xForm = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(0.4 + Math.random() * 0.2);
+      xForm.setWeight(0.4 + Math.random() * 0.2* rmsEnergy);
       String fncName;
       if (Math.random() < 0.33) {
         fncName = "bubble";
@@ -82,7 +82,7 @@ public Flame BrokatGen(int frameNumber, double valence, double arousal, int redS
     {
       XForm xForm = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(0.4 + Math.random() * 0.2);
+      xForm.setWeight(0.4 + Math.random() * 0.2* rmsEnergy);
       String fncName = ExperimentalSimpleRandomFlameGenerator.FNCLST_EXPERIMENTAL[Tools.randomInt(ExperimentalSimpleRandomFlameGenerator.FNCLST_EXPERIMENTAL.length)];
       xForm.addVariation(0.01 + Math.random() * 0.04, VariationFuncList.getVariationFuncInstance(fncName, true));
       if (Math.random() > 0.5) {

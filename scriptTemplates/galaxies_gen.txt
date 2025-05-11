@@ -22,7 +22,7 @@ Flame flame = new Flame();
     {
       XForm xForm = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(25.75871591);
+      xForm.setWeight(25.75871591 * rmsEnergy);
       xForm.setColor(0.74488914);
       //xForm.setColorType(ColorType.TARGET);
       //xForm.setTargetColor(196,157, 228);
@@ -56,8 +56,9 @@ Flame flame = new Flame();
     {
       XForm xForm = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(286.87636036);
-      xForm.setColor(0.90312262);
+      xForm.setWeight(286.87636036* rmsEnergy);
+      //xForm.setColor(0.90312262);
+      xForm.setColor(0.10312262);
       //xForm.setColorType(ColorType.TARGET);
       //xForm.setTargetColor(202,166, 225);
       xForm.setColorSymmetry(0.95);

@@ -13,9 +13,13 @@ public Flame LinearOnlyGen(int frameNumber, double valence, double arousal, int 
     flame.setPalette(palette);
 
     int maxXForms = (int) (2.0 + Math.random() * 5.0);
-    double scl = rmsEnergy * 10;
-    double tsclX = valence * 10;
-    double tsclY = arousal * 10;
+    //double scl = rmsEnergy;
+    double scl = 1;
+    //double tsclX = valence * 100;
+    //double tsclY = arousal * 100;
+    double tsclX = 2;
+    double tsclY = 2;
+    double tscl = 2;
 
     boolean contRot = Math.random() < 0.5;
     double r0 = 0;
@@ -37,14 +41,15 @@ public Flame LinearOnlyGen(int frameNumber, double valence, double arousal, int 
         }
       }
       XFormTransformService.localTranslate(xForm, (2.0 * Math.random() - 1.0) * tsclX, (2.0 * Math.random() - 1.0) * tsclY);
-      //XFormTransformService.localTranslate(xForm, (2.0 * PLACEHOLDER_1 - 1.0) * tscl, (2.0 * PLACEHOLDER_2 - 1.0) * tscl);
-      scl *= 0.8 + Math.random() * 0.1;
-      tsclX *= 0.8 + Math.random() * 0.1;
-      tsclY *= 0.8 + Math.random() * 0.1;
+      //XFormTransformService.localTranslate(xForm, (2.0 * Math.random() - valence) * tscl, (2.0 * Math.random() - arousal) * tscl);
+      scl *= 0.8 + Math.random() * rmsEnergy;
+      tsclX *= 0.8 + Math.random() * valence;
+      tsclY *= 0.8 + Math.random() * arousal;
       XFormTransformService.scale(xForm, scl, true, true);
 
       xForm.setColor(Math.random());
       //xForm.setColorType(ColorType.TARGET);
+      xForm.setColorSymmetry(-0.5);
       //xForm.setTargetColorCOLOR;
       xForm.addVariation(Math.random() * 0.5 + 0.5, new Linear3DFunc());
       xForm.setWeight(scl * Math.random() * 19.9 + 0.1);

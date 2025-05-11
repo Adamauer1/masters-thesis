@@ -23,7 +23,7 @@ public Flame SynthGen(int frameNumber, double valence, double arousal, int redSt
     {
       XForm xForm = xForm1 = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(1.0);
+      xForm.setWeight(1.0* rmsEnergy);
       xForm.setColor(0.0);
       //xForm.setColorType(ColorType.TARGET);
       //xForm.setTargetColor(196,157, 228);
@@ -144,7 +144,7 @@ public Flame SynthGen(int frameNumber, double valence, double arousal, int redSt
     {
       XForm xForm = xForm1.makeCopy();
       layer.getXForms().add(xForm);
-      xForm.setWeight(1.0);
+      xForm.setWeight(1.0* rmsEnergy);
       xForm.setColor(centre_color + Math.random()*0.5);
       //xForm.setColorType(ColorType.TARGET);
       //xForm.setTargetColor(196,157, 228);
@@ -164,7 +164,7 @@ public Flame SynthGen(int frameNumber, double valence, double arousal, int redSt
     if (Math.random() < 0.55) {
       XForm xForm = new XForm();
       layer.getXForms().add(xForm);
-      xForm.setWeight(5 * Math.random() + 0.125);
+      xForm.setWeight(5 * Math.random()* rmsEnergy + 0.125);
       xForm.setColor(centre_color + 0.2 * Math.random());
       //xForm.setColorType(ColorType.TARGET);
       //xForm.setTargetColor(196,157, 228);

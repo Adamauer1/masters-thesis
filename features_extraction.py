@@ -36,8 +36,8 @@ def load_audio(file_path, sr=44100):
 # 
 #     return feature_df
 
-def extract_bpm(y, sr):
-    tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
+def extract_bpm(y, sr, guess_bpm):
+    tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr, start_bpm=guess_bpm)
     return tempo
 
 def extract_features(y, sr, window_duration):
