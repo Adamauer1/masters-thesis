@@ -235,6 +235,7 @@ def generate_script(song_data, output_script_name):
     #     "RMSENERGY": frames[25]["pcm_RMSenergy_sma_amean"],
     #     "COLOR": frames[25]["color_start"]
     # }
+    print(video_frames[0])
     with open(new_file, 'w') as outfile:
         with open(header_file, 'r') as infile:
             content = infile.read()
@@ -492,8 +493,8 @@ v = np.mean(valence_values)
 a = np.mean(arousal_values)
 # print(v)
 # print(a)
-print(v*3)
-print(a*-2)
+#print(v*3)
+#print(a*-2)
 def get_paper_color(x,y):
     img = Image.open("tt.png") #tt
     width, height = img.size
@@ -502,12 +503,12 @@ def get_paper_color(x,y):
     pixel_y = int((1 - (y + 1) / 2) * height)
     return img.getpixel((pixel_x, pixel_y))
 color1 = get_paper_color(v,a)
-print(color1)
+#print(color1)
 angle = math.atan2(a, v)
 color2 = get_paper_color(math.cos(angle)*85/255, math.sin(angle)*85/255)
 color3 = get_paper_color(math.cos(angle), math.sin(angle))
-print(color2)
-print(color3)
+#print(color2)
+#print(color3)
 # genre_value = genre_model.predict(genre_features)
 # # values, counts = np.unique(genre_values, return_counts=True)
 # # max_count_index = np.argmax(counts)
@@ -546,7 +547,7 @@ print(color3)
 #generate_script(test_af)
 #print(get_color(-0.27, -0.068))
 
-#load_data("audio/rock_30_secs.mp3", 44100, "rock_sample", 120)
+load_data("audio/rock_30_secs.mp3", 44100, "rock_sample", 120)
 #load_data("Data/audio_files/genre_set/jazz.00000.wav", 22050, "jazz_sample")
 #load_data("Data/audio_files/genre_set/metal.00001.wav", 22050, "metal_sample")
 #load_data("Data/audio_files/genre_set/pop.00001.wav", 22050, "pop_sample")
