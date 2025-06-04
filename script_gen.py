@@ -20,10 +20,6 @@ def write_script(template_path, output_path, placeholders=None):
 
 
     for placeholder, value in placeholders.items():
-        # if placeholder == 'COLOR':
-        #     color = get_random_gradient_color(value)
-        #     content = content.replace(placeholder, str(color))
-        #else:
         content = content.replace(placeholder, str(value))
 
 
@@ -31,8 +27,6 @@ def write_script(template_path, output_path, placeholders=None):
         output_file.write(content)
 
     print(f"File generated: {output_path}")
-
-
 
 
 def get_genre_color(genre):
@@ -132,12 +126,7 @@ def get_color(x, y):
             rgb_values_0_255.append(None)
             #print(f"Original: ({x_orig:.3f}, {y_orig:.3f}), Pixel: ({x_pixel}, {y_pixel}), Out of bounds")
     return rgb_values_0_255[0]
-    #img = Image.open("tt.png") #tt
-    #width, height = img.size
 
-    #pixel_x = int((x + 1) / 2 * width)
-    #pixel_y = int((1 - (y + 1) / 2) * height)
-    #return img.getpixel((pixel_x, pixel_y))
 
 def get_colors(xs, ys):
     colors = []
@@ -152,17 +141,15 @@ def generate_script(song_data, output_script_name):
     reset_frame_counter = 0
     last_category = ""
     energy_mean = np.float64(0)
-    energy_std = 0
     audio_frames = song_data["audio_frames"]
-    #print(audio_frames)
+    
     for audio_frame in audio_frames:
         angle = math.atan2(audio_frames[audio_frame]["arousal"], audio_frames[audio_frame]["valence"])
         audio_frames[audio_frame]["startTime"] = audio_frame
         audio_frames[audio_frame]["category"] = get_category(math.degrees(angle))
         audio_frames[audio_frame]["color_start"] = get_genre_color(song_data["genre"])
         audio_frames[audio_frame]["color_end"] = get_color(audio_frames[audio_frame]["valence"], audio_frames[audio_frame]["arousal"])
-        #audio_frames[audio_frame]["color_end"] = get_color(math.cos(angle), math.sin(angle))
-        #print(energy_mean)
+
         if reset_frame_counter > 10:
             #generate new video frame
             print("change video frame due to timeout")
@@ -209,32 +196,16 @@ def generate_script(song_data, output_script_name):
                 energy_mean = energy_mean * (reset_frame_counter-1)/reset_frame_counter + audio_frames[audio_frame]["rms_mean"] / reset_frame_counter
             else:
                 energy_mean = audio_frames[audio_frame]["rms_mean"]
-            #energy_std = (energy_std + audio_frames[audio_frame]["rms_std"])/2
 
         reset_frame_counter += 1
-    #print(video_frames)
+
     video_frames[frame_index-1]["endTime"] = song_data["song_length"]
     for video_frame in video_frames:
         video_frames[video_frame]["frame_count"] = (video_frames[video_frame]["endTime"] - video_frames[video_frame]["startTime"]) * 24
-    #print(frame_index)
-    #print(video_frames)
-    # frame time starts at 15 and goes to 44
-    # for idx, video_frame in enumerate(video_frames):
-    #     if idx+1 != len(video_frames):
-    #         video_frames[video_frame]["end_time"] = video_frames[idx+1]
-    #template_file = f"oldTemplates/{audio_frames[44]["category"]}"
+
     new_file = f"scripts/{output_script_name}.jwfscript"
     header_file = "scriptTemplates/header.txt"
     footer_file = "scriptTemplates/footer.txt"
-    # placeholders = {
-    #     "VALENCE": frames[25]["valence"] * 3,
-    #     "AROUSAL": frames[25]["arousal"] * -2,
-    #     "RED_END": frames[25]["color_end"][0],
-    #     "GREEN_END": frames[25]["color_end"][1],
-    #     "BLUE_END": frames[25]["color_end"][2],
-    #     "RMSENERGY": frames[25]["pcm_RMSenergy_sma_amean"],
-    #     "COLOR": frames[25]["color_start"]
-    # }
     print(video_frames[0])
     with open(new_file, 'w') as outfile:
         with open(header_file, 'r') as infile:
@@ -244,30 +215,8 @@ def generate_script(song_data, output_script_name):
             outfile.write(f"\n// end header section\n")
 
         outfile.write(f"\n")
-        #outfile.write(f"LinearOnlyGen(0, {placeholders["VALENCE"]}, {placeholders["AROUSAL"]}, {placeholders["COLOR"][0]}, {placeholders["COLOR"][1]}, {placeholders["COLOR"][2]}, {placeholders["RED_END"]}, {placeholders["GREEN_END"]}, {placeholders["BLUE_END"]}, {placeholders["RMSENERGY"]});")
 
         for idx, video_frame in enumerate(video_frames):
-            #print(frame)
-            # placeholders = {
-            #     "FRAME_NUMBER": idx,
-            #     "VALENCE": video_frames[video_frame]["valence"] * 3,
-            #     "AROUSAL": video_frames[video_frame]["arousal"] * -2,
-            #     "RED_END": video_frames[video_frame]["color_end"][0],
-            #     "GREEN_END": video_frames[video_frame]["color_end"][1],
-            #     "BLUE_END": video_frames[video_frame]["color_end"][2],
-            #     "RMSENERGY": video_frames[video_frame]["pcm_RMSenergy_sma_amean"],
-            #     "COLOR": video_frames[video_frame]["color_start"]
-            # }
-            # with open(f"scriptTemplates/{frames[frame]["category"]}") as infile:
-            #     content = infile.read()
-            #     try:
-            #         for placeholder, value in placeholders.items():
-            #             content = content.replace(placeholder, str(value))
-            #     except KeyError as e:
-            #         print(f"Error: {e}")
-            #outfile.write("\n")
-            #outfile.write(f'{audio_frames[audio_frame]["category"]}({idx},{audio_frames[audio_frame]["valence"] * 3}, {audio_frames[audio_frame]["arousal"] * -2}, {audio_frames[audio_frame]["color_start"][0]}, {audio_frames[audio_frame]["color_start"][1]}, {audio_frames[audio_frame]["color_start"][2]}, {audio_frames[audio_frame]["color_end"][0]}, {audio_frames[audio_frame]["color_end"][1]}, {audio_frames[audio_frame]["color_end"][2]}, {audio_frames[audio_frame]["pcm_RMSenergy_sma_amean"]});')
-            #print(video_frames["color_start"])
             outfile.write(f'AddFlameMoviePart(flameMovie, {video_frames[video_frame]["category"]}({idx},{video_frames[video_frame]["valence"] * 3}, {video_frames[video_frame]["arousal"] * -2}, {video_frames[video_frame]["color_start"][0]}, {video_frames[video_frame]["color_start"][1]}, {video_frames[video_frame]["color_start"][2]}, {video_frames[video_frame]["color_end"][0]}, {video_frames[video_frame]["color_end"][1]}, {video_frames[video_frame]["color_end"][2]}, {video_frames[video_frame]["rms_mean"]*10}), {int(video_frames[video_frame]["frame_count"])});')
             outfile.write("\n")
         outfile.write(f'flameMovie.getGlobalScripts()[0] = new GlobalScript(GlobalScriptType.ROTATE_ROLL, {song_data["bpm"]});')
@@ -279,66 +228,36 @@ def generate_script(song_data, output_script_name):
 
         with open(f"scriptTemplates/mandelbrot_gen.txt", 'r') as infile:
             content = infile.read()
-            # try:
-            #     for placeholder, value in placeholders.items():
-            #         content = content.replace(placeholder, str(value))
-            # except KeyError as e:
-            #     print(f"Error: {e}")
             outfile.write("\n// start linear only gen flame\n")
             outfile.write(content)
             outfile.write("\n// end linear only gen flame\n")
 
         with open(f"scriptTemplates/linear_only_gen.txt", 'r') as infile:
             content = infile.read()
-            # try:
-            #     for placeholder, value in placeholders.items():
-            #         content = content.replace(placeholder, str(value))
-            # except KeyError as e:
-            #     print(f"Error: {e}")
             outfile.write("\n// start linear only gen flame\n")
             outfile.write(content)
             outfile.write("\n// end linear only gen flame\n")
 
         with open(f"scriptTemplates/brokat_gen.txt", 'r') as infile:
             content = infile.read()
-            # try:
-            #     for placeholder, value in placeholders.items():
-            #         content = content.replace(placeholder, str(value))
-            # except KeyError as e:
-            #     print(f"Error: {e}")
             outfile.write("\n// start brokat_gen flame\n")
             outfile.write(content)
             outfile.write("\n// end brokat_gen flame\n")
 
         with open(f"scriptTemplates/galaxies_gen.txt", 'r') as infile:
             content = infile.read()
-            # try:
-            #     for placeholder, value in placeholders.items():
-            #         content = content.replace(placeholder, str(value))
-            # except KeyError as e:
-            #     print(f"Error: {e}")
             outfile.write("\n// start galaxies_gen flame\n")
             outfile.write(content)
             outfile.write("\n// end galaxies_gen flame\n")
 
         with open(f"scriptTemplates/julian_gen.txt", 'r') as infile:
             content = infile.read()
-            # try:
-            #     for placeholder, value in placeholders.items():
-            #         content = content.replace(placeholder, str(value))
-            # except KeyError as e:
-            #     print(f"Error: {e}")
             outfile.write("\n// start julian_gen flame\n")
             outfile.write(content)
             outfile.write("\n// end julian_gen flame\n")
 
         with open(f"scriptTemplates/synth_gen.txt", 'r') as infile:
             content = infile.read()
-        # try:
-        #     for placeholder, value in placeholders.items():
-        #         content = content.replace(placeholder, str(value))
-        # except KeyError as e:
-        #     print(f"Error: {e}")
             outfile.write("\n// start synth_gen flame\n")
             outfile.write(content)
             outfile.write("\n// end synth_gen flame\n")
@@ -347,14 +266,7 @@ def generate_script(song_data, output_script_name):
             content = infile.read()
             outfile.write("\n")
             outfile.write(content)
-        # with open(f"scriptTemplates/fft_motion_gen.txt", 'r') as infile:
-        #     content = infile.read()
-        #     outfile.write("\n")
-        #     outfile.write(content)
-        # with open(f"scriptTemplates/saw_tooth_motion_gen.txt", 'r') as infile:
-        #     content = infile.read()
-        #     outfile.write("\n")
-        #     outfile.write(content)
+
         with open(f"scriptTemplates/add_flame_movie_part.txt", 'r') as infile:
             content = infile.read()
             outfile.write("\n")
@@ -503,7 +415,7 @@ def get_paper_color(x,y):
     pixel_y = int((1 - (y + 1) / 2) * height)
     return img.getpixel((pixel_x, pixel_y))
 color1 = get_paper_color(v,a)
-#print(color1)
+#print(color1) 
 angle = math.atan2(a, v)
 color2 = get_paper_color(math.cos(angle)*85/255, math.sin(angle)*85/255)
 color3 = get_paper_color(math.cos(angle), math.sin(angle))

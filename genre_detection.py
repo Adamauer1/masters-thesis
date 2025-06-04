@@ -1,11 +1,9 @@
-import numpy as np
+#import numpy as np
 import pandas as pd
-from scipy.stats import pearsonr
+#from scipy.stats import pearsonr
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import root_mean_squared_error, mean_absolute_error, accuracy_score, precision_score, recall_score, \
-    f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
-
 import joblib
 
 def prepare_data(targets):
@@ -13,7 +11,6 @@ def prepare_data(targets):
     y = []
     
     for target in targets:
-        
         file_name = target[0]
         if file_name == "jazz.00054.wav":
             continue
@@ -28,7 +25,7 @@ def prepare_data(targets):
 
 def display_metrics(y_true, y_pred):
     accuracy = accuracy_score(y_true, y_pred)
-    precision = precision_score(y_true, y_pred, average='weighted')  # 'weighted' for multiclass
+    precision = precision_score(y_true, y_pred, average='weighted')  # 'weighted' for multi class
     recall = recall_score(y_true, y_pred, average='weighted')
     f1 = f1_score(y_true, y_pred, average='weighted')
 
@@ -39,7 +36,7 @@ def display_metrics(y_true, y_pred):
     print(f"F1 Score: {f1:.4f}")
     print("\n")
 
-def train_data(data):
+def train_data(data, save_model=True):
     X, y = prepare_data(data)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -47,8 +44,15 @@ def train_data(data):
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
     display_metrics(y_pred=y_pred, y_true=y_test)
-    joblib.dump(model, f'trained_models/genre_rf_model.pkl')
     
+    # save current model
+    if (save_model):
+        save_model(model, "genre_rf_model")
+    #joblib.dump(model, f'trained_models/genre_rf_model.pkl')
+
+def save_model(model, filename):
+    joblib.dump(model, f'trained_models/{filename}.pkl')
+
     
 genre_file_path = "Data/features_30_sec.csv"
 genre_df = pd.read_csv(genre_file_path)
