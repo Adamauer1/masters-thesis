@@ -1,8 +1,9 @@
 /Data
 /images
-/trained_models
 /old
 /final_videos
 *.mp4
 /scripts
 /audio
+trained_models/genre_rf_model.pkl
+trained_models/valence_rf_model.pkl
